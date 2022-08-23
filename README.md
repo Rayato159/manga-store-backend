@@ -15,7 +15,7 @@
 </ul>
 
 <h3>💾 Database Schema</h3>
-<img src="./assets/screenshots/manga_store_db.png">
+<img src="./assets/screenshots/schema.png">
 
 <h3>🔩 Initialize The Project (Just an example)</h3>
 <ul>
