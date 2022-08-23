@@ -1,4 +1,4 @@
-<h1>📚 Manga Shop Project</h1>
+<h1>📚 Manga Store Project</h1>
 <h3>🧑🏼‍💻 Established by</h3>
 <ul>
     <li><strong>Ruangyot Nanchiang</strong></li>
@@ -35,7 +35,6 @@
     <li><strong>📂 configs/</strong>
         <ul>
             <li>configs.go</li>
-            <li>fiber_configs.go</li>
         </ul>
     </li>
     <li><strong>📂 internals/</strong>
