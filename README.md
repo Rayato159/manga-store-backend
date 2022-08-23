@@ -14,6 +14,9 @@
     <li>This project is to build a REST API with Golang and GO Fiber using the clean architecture of Uncle Bob.</li>
 </ul>
 
+<h3>📃 Database Schema</h3>
+<img src="./assets/screenshots/manga_store_db.png">
+
 <h3>🔩 Initialize The Project (Just an example)</h3>
 <ul>
     <li><strong>📂 app/</strong>
