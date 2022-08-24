@@ -29,6 +29,11 @@ func NewServer(cfg *configs.Configs, db *sqlx.DB, file *os.File) *Server {
 }
 
 func (s *Server) Start() {
+	if err := s.MapHandlers(); err != nil {
+		log.Println(err.Error())
+		panic(err.Error())
+	}
+
 	fiberConnURL, err := utils.ConnectionUrlBuilder("fiber", s.Cfg)
 	if err != nil {
 		log.Println(err.Error())
