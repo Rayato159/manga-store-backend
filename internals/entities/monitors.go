@@ -1,6 +1,10 @@
 package entities
 
-import "context"
+import (
+	"context"
+
+	"github.com/rayato159/manga-store/configs"
+)
 
 type MonitorsContext string
 
@@ -11,8 +15,7 @@ const (
 )
 
 type MonitorsUsecase interface {
-	HealthCheck(ctx context.Context) Monitor
-	VersionCheck(ctx context.Context) Monitor
+	HealthCheck(ctx context.Context, cfg *configs.Configs) Monitor
 }
 
 type Monitor struct {

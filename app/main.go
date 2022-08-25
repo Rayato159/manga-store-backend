@@ -30,6 +30,8 @@ func main() {
 	cfg.PostgreSQL.Password = os.Getenv("DB_PASSWORD")
 	cfg.PostgreSQL.Database = os.Getenv("DB_DATABASE")
 
+	cfg.App.Version = os.Getenv("APP_VERSION")
+
 	// New Database
 	db, err := databases.NewPostgreSQLDBConnection(cfg)
 	if err != nil {

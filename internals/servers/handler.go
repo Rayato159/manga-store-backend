@@ -31,9 +31,8 @@ func (s *Server) MapHandlers() error {
 	v1 := s.Fiber.Group("/v1")
 
 	//* Monitor group.
-	monitorGroup := v1.Group("/monitors")
 	monitorUsecase := _monitorsUsecase.NewMonitorsUsecase()
-	_monitorsHttp.NewMonitorsController(monitorGroup, monitorUsecase)
+	_monitorsHttp.NewMonitorsController(v1, s.Cfg, monitorUsecase)
 
 	// End point not found response
 	s.Fiber.Use(func(c *fiber.Ctx) error {

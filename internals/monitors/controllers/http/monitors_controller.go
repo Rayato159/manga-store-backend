@@ -5,47 +5,34 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
 )
 
 type monitorsCon struct {
 	MonitorsUC entities.MonitorsUsecase
+	Cfg        *configs.Configs
 }
 
-func NewMonitorsController(r fiber.Router, monitorUC entities.MonitorsUsecase) {
+func NewMonitorsController(r fiber.Router, cfg *configs.Configs, monitorUC entities.MonitorsUsecase) {
 	controller := &monitorsCon{
 		MonitorsUC: monitorUC,
+		Cfg:        cfg,
 	}
-	r.Get("/health", controller.HealthCheck)
-	r.Get("/version", controller.VersionCheck)
+	r.Get("/", controller.HealthCheck)
 }
 
 func (mc *monitorsCon) HealthCheck(c *fiber.Ctx) error {
 	ctx := context.WithValue(c.Context(), entities.MonitorsCon, "Con.HealthCheck")
 	defer log.Println(ctx.Value(entities.MonitorsCon))
 
-	res := mc.MonitorsUC.HealthCheck(ctx)
+	res := mc.MonitorsUC.HealthCheck(ctx, mc.Cfg)
 	return c.Status(fiber.StatusOK).JSON(entities.Response{
 		Status:     "OK",
 		StatusCode: fiber.StatusOK,
 		Message:    "",
 		Result: entities.Result{
-			Data: res.Health,
-		},
-	})
-}
-
-func (mc *monitorsCon) VersionCheck(c *fiber.Ctx) error {
-	ctx := context.WithValue(c.Context(), entities.MonitorsCon, "Con.VersionCheck")
-	defer log.Println(ctx.Value(entities.MonitorsCon))
-
-	res := mc.MonitorsUC.VersionCheck(ctx)
-	return c.Status(fiber.StatusOK).JSON(entities.Response{
-		Status:     "OK",
-		StatusCode: fiber.StatusOK,
-		Message:    "",
-		Result: entities.Result{
-			Data: res.Version,
+			Data: res,
 		},
 	})
 }

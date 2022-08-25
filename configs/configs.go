@@ -10,6 +10,7 @@ import (
 type Configs struct {
 	Fiber      Fiber
 	PostgreSQL PostgreSQL
+	App        App
 }
 
 type Fiber struct {
@@ -30,6 +31,10 @@ type PostgreSQL struct {
 	MaxConnections         string
 	MaxIdleConnections     string
 	MaxLifeTimeConnections string
+}
+
+type App struct {
+	Version string
 }
 
 func NewFiberConfig(c *Configs) fiber.Config {
