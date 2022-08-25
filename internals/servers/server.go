@@ -30,13 +30,13 @@ func NewServer(cfg *configs.Configs, db *sqlx.DB, file *os.File) *Server {
 
 func (s *Server) Start() {
 	if err := s.MapHandlers(); err != nil {
-		log.Println(err.Error())
+		log.Fatalln(err.Error())
 		panic(err.Error())
 	}
 
 	fiberConnURL, err := utils.ConnectionUrlBuilder("fiber", s.Cfg)
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatalln(err.Error())
 		panic(err.Error())
 	}
 
@@ -45,7 +45,7 @@ func (s *Server) Start() {
 	log.Printf("server has been started on %s:%s ⚡", host, port)
 
 	if err := s.Fiber.Listen(fiberConnURL); err != nil {
-		log.Println(err.Error())
+		log.Fatalln(err.Error())
 		panic(err.Error())
 	}
 }

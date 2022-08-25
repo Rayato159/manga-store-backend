@@ -35,7 +35,7 @@ func main() {
 	// New Database
 	db, err := databases.NewPostgreSQLDBConnection(cfg)
 	if err != nil {
-		log.Println(err)
+		log.Fatalln(err.Error())
 	}
 	defer db.Close()
 
