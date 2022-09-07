@@ -9,6 +9,11 @@
     <li><strong>1.0.0</strong></li>
 </ul>
 
+<h3>🌱 Status</h3>
+<ul>
+    <li><strong>In progress about 10%</strong></li>
+</ul>
+
 <h3>📃 Introduction</h3>
 <ul>
     <li>This project is to build a REST API with Golang and GO Fiber using the clean architecture of Uncle Bob.</li>
