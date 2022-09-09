@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"log"
 	"strconv"
 
@@ -9,7 +10,16 @@ import (
 	"github.com/rayato159/manga-store/pkg/utils"
 )
 
+type RedisContext string
+
+const (
+	RedisConnection RedisContext = "RedisConnection"
+)
+
 func NewRedisConnection(cfg *configs.Configs) *redis.Client {
+	ctx := context.WithValue(context.TODO(), RedisConnection, "Ctx.NewRedisConnection")
+	defer ctx.Done()
+
 	url, err := utils.ConnectionUrlBuilder("redis", cfg)
 	if err != nil {
 		panic(err.Error())
@@ -25,6 +35,10 @@ func NewRedisConnection(cfg *configs.Configs) *redis.Client {
 		Password: cfg.Redis.Password,
 		DB:       db,
 	})
-	log.Println("redis client has been connected 📕")
+	pong, err := rdb.Ping(ctx).Result()
+	if err != nil {
+		panic(err.Error())
+	}
+	log.Printf("ping -> %v redis client has been connected 📕", pong)
 	return rdb
 }

@@ -24,6 +24,7 @@
     <li>🐳 Dokcer</li>
     <li>⚡ GO v1.18+</li>
     <li>🐘 PostgreSQL</li>
+    <li>📕 Redis</li>
     <li>🧑‍🚀 Postman</li>
 </ul>
 
@@ -71,6 +72,27 @@ create database manga_store_db;
       Name      |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
 ----------------+----------+----------+------------+------------+-----------------------
  manga_store_db | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+```
+</li>
+</ul>
+
+<h3>Install the Redis on Docker</h3>
+<ul>
+<li>
+
+<strong>Pull Image -> <a href="https://hub.docker.com/_/redis" target="_blank">Redis Docker Image</a></strong>
+
+```
+docker pull redis:alpine
+```
+</li>
+
+<li>
+
+<strong>Run the container</strong>
+
+```
+docker run --name manga-store-redis -p 6379:6379 -d redis
 ```
 </li>
 </ul>
