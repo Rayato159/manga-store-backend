@@ -98,7 +98,7 @@ docker run --name manga-store-redis -p 6379:6379 -d redis
 </ul>
 
 <h3>💾 Database Schema</h3>
-<img src="./assets/screenshots/schema_v1.png">
+<img src="./assets/screenshots/schema_v2.png">
 
 <h3>🔩 Initialize The Project (Just an example)</h3>
 <ul>

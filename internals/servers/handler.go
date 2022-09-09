@@ -4,8 +4,13 @@ import (
 	"log"
 
 	"github.com/rayato159/manga-store/internals/entities"
+
 	_monitorsHttp "github.com/rayato159/manga-store/internals/monitors/controllers/http"
 	_monitorsUsecase "github.com/rayato159/manga-store/internals/monitors/usecases"
+
+	_usersHttp "github.com/rayato159/manga-store/internals/users/controllers/http"
+	_usersRepository "github.com/rayato159/manga-store/internals/users/repositories"
+	_usersUsecase "github.com/rayato159/manga-store/internals/users/usecases"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -30,9 +35,15 @@ func (s *Server) MapHandlers() error {
 	// Group a version
 	v1 := s.Fiber.Group("/v1")
 
-	//* Monitor group.
-	monitorUsecase := _monitorsUsecase.NewMonitorsUsecase()
-	_monitorsHttp.NewMonitorsController(v1, s.Cfg, monitorUsecase)
+	//* Monitors group.
+	monitorsUsecase := _monitorsUsecase.NewMonitorsUsecase()
+	_monitorsHttp.NewMonitorsController(v1, s.Cfg, monitorsUsecase)
+
+	//* Users group
+	usersGroup := v1.Group("/users")
+	usersRepository := _usersRepository.NewUsersRepository(s.Db)
+	usersUsecase := _usersUsecase.NewUsersUsecase(usersRepository)
+	_usersHttp.NewUsersController(usersGroup, usersUsecase)
 
 	// End point not found response
 	s.Fiber.Use(func(c *fiber.Ctx) error {

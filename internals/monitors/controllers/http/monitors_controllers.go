@@ -10,14 +10,14 @@ import (
 )
 
 type monitorsCon struct {
-	MonitorsUC entities.MonitorsUsecase
-	Cfg        *configs.Configs
+	MonitorsUse entities.MonitorsUsecase
+	Cfg         *configs.Configs
 }
 
-func NewMonitorsController(r fiber.Router, cfg *configs.Configs, monitorUC entities.MonitorsUsecase) {
+func NewMonitorsController(r fiber.Router, cfg *configs.Configs, monitorsUse entities.MonitorsUsecase) {
 	controller := &monitorsCon{
-		MonitorsUC: monitorUC,
-		Cfg:        cfg,
+		MonitorsUse: monitorsUse,
+		Cfg:         cfg,
 	}
 	r.Get("/", controller.HealthCheck)
 }
@@ -26,7 +26,7 @@ func (mc *monitorsCon) HealthCheck(c *fiber.Ctx) error {
 	ctx := context.WithValue(c.Context(), entities.MonitorsCon, "Con.HealthCheck")
 	defer log.Println(ctx.Value(entities.MonitorsCon))
 
-	res := mc.MonitorsUC.HealthCheck(ctx, mc.Cfg)
+	res := mc.MonitorsUse.HealthCheck(ctx, mc.Cfg)
 	return c.Status(fiber.StatusOK).JSON(entities.Response{
 		Status:     "OK",
 		StatusCode: fiber.StatusOK,

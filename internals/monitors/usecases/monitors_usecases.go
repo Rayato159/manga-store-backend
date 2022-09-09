@@ -19,7 +19,7 @@ func NewMonitorsUsecase() entities.MonitorsUsecase {
 	}
 }
 
-func (mu monitorsUse) HealthCheck(ctx context.Context, cfg *configs.Configs) entities.Monitor {
+func (mu *monitorsUse) HealthCheck(ctx context.Context, cfg *configs.Configs) entities.Monitor {
 	ctx = context.WithValue(ctx, entities.MonitorsUse, "Use.HealthCheck")
 	defer log.Println(ctx.Value(entities.MonitorsUse))
 
