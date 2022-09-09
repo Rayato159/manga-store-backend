@@ -10,6 +10,8 @@ import (
 type Configs struct {
 	Fiber      Fiber
 	PostgreSQL PostgreSQL
+	Redis      Redis
+	File       File
 	App        App
 }
 
@@ -31,6 +33,17 @@ type PostgreSQL struct {
 	MaxConnections         string
 	MaxIdleConnections     string
 	MaxLifeTimeConnections string
+}
+
+type Redis struct {
+	Host     string
+	Port     string
+	Password string
+	Database string
+}
+
+type File struct {
+	LogPath string
 }
 
 type App struct {

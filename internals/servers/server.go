@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/configs"
@@ -14,16 +15,18 @@ type Server struct {
 	Fiber *fiber.App
 	Cfg   *configs.Configs
 	Db    *sqlx.DB
+	Redis *redis.Client
 	File  *os.File
 }
 
-func NewServer(cfg *configs.Configs, db *sqlx.DB, file *os.File) *Server {
+func NewServer(cfg *configs.Configs, db *sqlx.DB, rdb *redis.Client, file *os.File) *Server {
 	fiberConfigs := configs.NewFiberConfig(cfg)
 	app := fiber.New(fiberConfigs)
 	return &Server{
 		Fiber: app,
 		Cfg:   cfg,
 		Db:    db,
+		Redis: rdb,
 		File:  file,
 	}
 }
@@ -40,8 +43,8 @@ func (s *Server) Start() {
 		panic(err.Error())
 	}
 
-	host := os.Getenv("SERVER_HOST")
-	port := os.Getenv("SERVER_PORT")
+	host := s.Cfg.Fiber.Host
+	port := s.Cfg.Fiber.Port
 	log.Printf("server has been started on %s:%s ⚡", host, port)
 
 	if err := s.Fiber.Listen(fiberConnURL); err != nil {

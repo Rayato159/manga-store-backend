@@ -2,8 +2,8 @@ package utils
 
 import "github.com/joho/godotenv"
 
-func LoadDotenv() {
-	if err := godotenv.Load(".env"); err != nil {
+func LoadDotenv(stage string) {
+	if err := godotenv.Load(stage); err != nil {
 		panic(err.Error())
 	}
 }

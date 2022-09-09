@@ -23,6 +23,8 @@ func ConnectionUrlBuilder(stuff string, cfg *configs.Configs) (string, error) {
 			cfg.PostgreSQL.Database,
 			cfg.PostgreSQL.SSLMode,
 		)
+	case "redis":
+		url = fmt.Sprintf("%s:%s", cfg.Redis.Host, cfg.Redis.Port)
 	default:
 		errMsg := fmt.Sprintf("error, connection url builder doesn't know the %s", stuff)
 		return "", errors.New(errMsg)
