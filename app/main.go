@@ -39,6 +39,7 @@ func main() {
 
 	// App
 	cfg.App.Version = os.Getenv("APP_VERSION")
+	cfg.App.AdminKey = os.Getenv("ADMIN_KEY")
 	cfg.App.Stage = os.Getenv("STAGE")
 
 	// File

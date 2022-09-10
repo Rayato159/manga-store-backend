@@ -43,7 +43,7 @@ func (s *Server) MapHandlers() error {
 	usersGroup := v1.Group("/users")
 	usersRepository := _usersRepository.NewUsersRepository(s.Db)
 	usersUsecase := _usersUsecase.NewUsersUsecase(usersRepository)
-	_usersHttp.NewUsersController(usersGroup, usersUsecase)
+	_usersHttp.NewUsersController(usersGroup, s.Cfg, usersUsecase)
 
 	// End point not found response
 	s.Fiber.Use(func(c *fiber.Ctx) error {

@@ -30,11 +30,11 @@ const (
 )
 
 type UsersRegisterReq struct {
-	Username        string    `db:"username" json:"username" copier:"Username"`
-	Password        string    `db:"password" json:"password"`
-	ConfirmPassword string    `json:"confirm_passowrd"`
-	Role            UsersRole `db:"role" json:"role"`
-	AdminKey        string    `json:"admin_key"`
+	Username        string    `db:"username" json:"username" form:"username" copier:"Username"`
+	Password        string    `db:"password" json:"password" form:"password"`
+	ConfirmPassword string    `json:"passowrd_confirm" form:"password_confirm"`
+	Role            UsersRole `db:"role" json:"role" form:"role"`
+	AdminKey        string    `json:"admin_key" form:"admin_key"`
 }
 
 type UsersRegisterRes struct {
