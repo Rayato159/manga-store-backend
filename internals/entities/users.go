@@ -7,7 +7,7 @@ import (
 type UsersContext string
 
 const (
-	usersCon UsersContext = "UsersController"
+	UsersCon UsersContext = "UsersController"
 	UsersUse UsersContext = "UsersUsecase"
 	UsersRep UsersContext = "UsersRepository"
 )

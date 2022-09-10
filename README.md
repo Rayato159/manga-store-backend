@@ -44,7 +44,7 @@ docker pull postgres:alpine
 <strong>Run the container</strong>
 
 ```
-docker run --name postgres-manga-store -e POSTGRES_PASSWORD=123456 -p 3435:5432 -d postgres:alpine
+docker run --name manga-store-db-<your-stage> -e POSTGRES_PASSWORD=123456 -p <your-port>:5432 -d postgres:alpine
 ```
 </li>
 <li>
@@ -52,7 +52,7 @@ docker run --name postgres-manga-store -e POSTGRES_PASSWORD=123456 -p 3435:5432 
 <strong>Config the postgres</strong>
 
 ```
-docker exec -it postgres-manga-store bash
+docker exec -it manga-store-db-<your-stage> bash
 ```
 ```
 psql -U postgres
@@ -71,7 +71,7 @@ create database manga_store_db;
 ```
       Name      |  Owner   | Encoding |  Collate   |   Ctype    |   Access privileges
 ----------------+----------+----------+------------+------------+-----------------------
- manga_store_db | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
+ manga_store_db_<your_stage> | postgres | UTF8     | en_US.utf8 | en_US.utf8 |
 ```
 </li>
 </ul>
@@ -107,7 +107,7 @@ docker run --name manga-store-redis -p 6379:6379 -d redis
 <strong>Migrate Up</strong>
 
 ```
-migrate -database 'postgres://postgres:123456@localhost:3435/manga_store_db?sslmode=disable' -source file://to-the-path -verbose up
+migrate -database 'postgres://postgres:123456@0.0.0.0:3435/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose up
 ```
 </li>
 
@@ -116,7 +116,7 @@ migrate -database 'postgres://postgres:123456@localhost:3435/manga_store_db?sslm
 <strong>Migrate Down</strong>
 
 ```
-migrate -database 'postgres://postgres:123456@localhost:3435/manga_store_db?sslmode=disable' -source file://to-the-path -verbose down
+migrate -database 'postgres://postgres:123456@0.0.0.0:3435/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose down
 ```
 </li>
 </ul>
