@@ -1,6 +1,6 @@
 package entities_test
 
-import "context"
+import "github.com/rayato159/manga-store/internals/entities"
 
 type TestUsersContext string
 
@@ -10,8 +10,7 @@ const (
 	TestUsersRep TestUsersContext = "TestUsersRepository"
 )
 
-type TestUsersUsecase interface {
-	TestRegister(ctx context.Context) error
+type UsersRegisterTest struct {
+	Input  *entities.UsersRegisterReq
+	Expect string
 }
-
-type TestUsersRepository interface{}
