@@ -39,6 +39,7 @@ func main() {
 
 	// App
 	cfg.App.Version = os.Getenv("APP_VERSION")
+	cfg.App.Stage = os.Getenv("STAGE")
 
 	// File
 	cfg.File.LogPath = os.Getenv("FILE_LOG_PATH")

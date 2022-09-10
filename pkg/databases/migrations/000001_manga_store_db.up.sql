@@ -31,7 +31,6 @@ CREATE TYPE "order_status" AS ENUM (
 
 CREATE TABLE "users" (
   "id" uuid NOT NULL UNIQUE PRIMARY KEY DEFAULT uuid_generate_v4(),
-  "email" VARCHAR NOT NULL UNIQUE,
   "password" VARCHAR NOT NULL,
   "username" VARCHAR NOT NULL UNIQUE,
   "role" VARCHAR NOT NULL DEFAULT 'user',

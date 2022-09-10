@@ -22,6 +22,8 @@ func NewPostgreSQLDBConnection(cfg *configs.Configs) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	log.Println("postgreSQL database has been connected 🐘")
+	if cfg.App.Stage != "test" {
+		log.Println("postgreSQL database has been connected 🐘")
+	}
 	return db, nil
 }

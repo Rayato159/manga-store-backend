@@ -1,6 +1,9 @@
 package http
 
 import (
+	"context"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/internals/entities"
 )
@@ -16,6 +19,9 @@ func NewUsersController(r fiber.Router, usersUC entities.UsersUsecase) {
 	r.Post("/", controller.Register)
 }
 
-func (uc *usersCon) Register(c *fiber.Ctx) error {
+func (tuc *usersCon) Register(c *fiber.Ctx) error {
+	ctx := context.WithValue(c.Context(), entities.UsersCon, "Con.TestRegister")
+	defer log.Println(ctx.Value(entities.UsersCon))
+
 	return nil
 }
