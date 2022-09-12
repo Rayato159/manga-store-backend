@@ -49,6 +49,7 @@ func NewTestUsers() *testUsers {
 	// App
 	cfg.App.Version = os.Getenv("APP_VERSION")
 	cfg.App.Stage = os.Getenv("STAGE")
+	cfg.App.AdminKey = os.Getenv("ADMIN_KEY")
 
 	// New Database
 	db, err := databases.NewPostgreSQLDBConnection(cfg)
@@ -167,20 +168,20 @@ func TestStartUsers(t *testing.T) {
 	}
 
 	for i := 0; i < 4; i++ {
-		_, err := testUsersController.Register(testUsersRegister[i].Input)
+		_, err := testUsersController.Register(test.Cfg, testUsersRegister[i].Input)
 		if err.Error() != testUsersRegister[i].Expect {
 			t.Errorf("expect: <%v> but got -> <%v>", testUsersRegister[i].Expect, err.Error())
 		}
 	}
 
-	result5, err5 := testUsersController.Register(testUsersRegister[4].Input)
+	result5, err5 := testUsersController.Register(test.Cfg, testUsersRegister[4].Input)
 	if err5 != nil {
 		t.Errorf("expect: <nil> but got -> <%v>", err5.Error())
 	} else if result5.Username != "user" {
 		t.Errorf("expect: <%v> but got -> <%v>", result5.Username, err5.Error())
 	}
 
-	result6, err6 := testUsersController.Register(testUsersRegister[5].Input)
+	result6, err6 := testUsersController.Register(test.Cfg, testUsersRegister[5].Input)
 	if err6 != nil {
 		t.Errorf("expect: <nil> but got -> <%v>", err6.Error())
 	} else if result6.Username != "admin" {
@@ -188,11 +189,9 @@ func TestStartUsers(t *testing.T) {
 	}
 }
 
-func (tuc *testUsersCon) Register(req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {
+func (tuc *testUsersCon) Register(cfg *configs.Configs, req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {
 	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
 	defer log.Println(ctx.Value(entities_test.TestUsersCon))
-
-	utils.LoadDotenv("../.env.test")
 
 	if req.Password != req.ConfirmPassword {
 		return nil, errors.New("error, confirm password is not match")
@@ -200,7 +199,7 @@ func (tuc *testUsersCon) Register(req *entities.UsersRegisterReq) (*entities.Use
 
 	switch req.Role {
 	case entities.Admin:
-		if req.AdminKey != os.Getenv("ADMIN_KEY") {
+		if req.AdminKey != cfg.App.AdminKey {
 			return nil, errors.New("error, admin key is invalid")
 		}
 	case entities.User:
