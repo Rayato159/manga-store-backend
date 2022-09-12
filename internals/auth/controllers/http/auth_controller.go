@@ -1,4 +1,4 @@
-package controllers
+package http
 
 import (
 	"github.com/gofiber/fiber/v2"
@@ -7,14 +7,16 @@ import (
 )
 
 type authCon struct {
-	AuthUse entities.AuthUsecase
-	Cfg     *configs.Configs
+	AuthUse  entities.AuthUsecase
+	UsersUse entities.UsersUsecase
+	Cfg      *configs.Configs
 }
 
-func NewAuthController(r fiber.Router, cfg *configs.Configs, authUse entities.AuthUsecase) {
+func NewAuthController(r fiber.Router, cfg *configs.Configs, authUse entities.AuthUsecase, usersUse entities.UsersUsecase) {
 	controller := &authCon{
-		AuthUse: authUse,
-		Cfg:     cfg,
+		AuthUse:  authUse,
+		UsersUse: usersUse,
+		Cfg:      cfg,
 	}
 	r.Post("/login", controller.Login)
 }

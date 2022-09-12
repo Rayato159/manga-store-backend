@@ -19,7 +19,7 @@ func NewUsersRepository(db *sqlx.DB) entities.UsersRepository {
 	}
 }
 
-func (ur *usersRepo) FindOneUser(ctx context.Context, req string) (*entities.Credentials, error) {
+func (ur *usersRepo) FindOneUser(ctx context.Context, req string) (*entities.UsersCredentialsReq, error) {
 	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.FindOneUser")
 	defer log.Println(ctx.Value(entities.UsersRep))
 
@@ -30,7 +30,7 @@ func (ur *usersRepo) FindOneUser(ctx context.Context, req string) (*entities.Cre
 	FROM "users" 
 	WHERE "username" = $1`
 
-	user := new(entities.Credentials)
+	user := new(entities.UsersCredentialsReq)
 	if err := ur.Db.Get(user, query, req); err != nil {
 		log.Println(err.Error())
 		return user, errors.New("error, user not found")

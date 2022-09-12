@@ -19,7 +19,7 @@ type UsersUsecase interface {
 
 type UsersRepository interface {
 	Register(ctx context.Context, req *UsersRegisterReq) (*UsersRegisterRes, error)
-	FindOneUser(ctx context.Context, req string) (*Credentials, error)
+	FindOneUser(ctx context.Context, req string) (*UsersCredentialsReq, error)
 }
 
 type UsersRole string
