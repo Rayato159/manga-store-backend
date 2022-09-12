@@ -19,7 +19,7 @@ type UsersUsecase interface {
 
 type UsersRepository interface {
 	Register(ctx context.Context, req *UsersRegisterReq) (*UsersRegisterRes, error)
-	FindOneUser(ctx context.Context, req string) (*UserInfo, error)
+	FindOneUser(ctx context.Context, req string) (*Credentials, error)
 }
 
 type UsersRole string
@@ -41,9 +41,4 @@ type UsersRegisterRes struct {
 	Username  string    `db:"username" json:"username" copier:"Username"`
 	CreatedAt time.Time `db:"created_at" json:"created_at" copier:"CreatedAt"`
 	UpdatedAt time.Time `db:"updated_at" json:"updated_at" copier:"UpdatedAt"`
-}
-
-type UserInfo struct {
-	Username string `db:"username"`
-	Password string `db:"password"`
 }
