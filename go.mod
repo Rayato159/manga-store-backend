@@ -8,6 +8,8 @@ require (
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v9 v9.0.0-beta.2 // indirect
 	github.com/gofiber/fiber/v2 v2.36.0 // indirect
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+	github.com/google/uuid v1.3.0 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect

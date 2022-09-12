@@ -1,6 +1,11 @@
 package entities
 
-import "context"
+import (
+	"context"
+	"time"
+
+	"github.com/golang-jwt/jwt/v4"
+)
 
 type AuthContext string
 
@@ -8,6 +13,14 @@ const (
 	AuthCon AuthContext = "AuthController"
 	AuthUse AuthContext = "AuthUsecase"
 	AuthRep AuthContext = "AuthRepository"
+)
+
+type ClaimsType string
+
+const (
+	AccessToken  ClaimsType = "access_token"
+	RefreshToken ClaimsType = "refresh_token"
+	SessionToken ClaimsType = "session_token"
 )
 
 type AuthRepository interface {
@@ -28,8 +41,41 @@ type UsersCredentialsRes struct {
 	SessionToken string `db:"session_token" json:"session_token"`
 }
 
-type UsersPayload struct {
+type UsersAccessToken struct {
+	Id   string `db:"id" json:"id"`
+	Role string `db:"role" json:"role"`
+}
+
+type UsersRefreshToken struct {
+	Id        string `db:"id" json:"id"`
+	Role      string `db:"role" json:"role"`
+	ExpiresAt *time.Time
+	IssuedAt  *time.Time
+}
+
+type UsersSessionToken struct {
+	Id        string `db:"id" json:"id"`
+	Username  string `db:"username" json:"username"`
+	Role      string `db:"role" json:"role"`
+	ExpiresAt *time.Time
+	IssuedAt  *time.Time
+}
+
+type UsersJwtClaimsReq struct {
+	UsersAccessToken  *UsersAccessToken
+	UsersRefreshToken *UsersRefreshToken
+	UsersSessionToken *UsersSessionToken
+}
+
+type UsersJwtTokenMapClaims struct {
+	Id   string `db:"id" json:"id"`
+	Role string `db:"role" json:"role"`
+	jwt.RegisteredClaims
+}
+
+type UsersJwtSessionMapClaims struct {
 	Id       string `db:"id" json:"id"`
 	Username string `db:"username" json:"username"`
 	Role     string `db:"role" json:"role"`
+	jwt.RegisteredClaims
 }

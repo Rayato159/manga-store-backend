@@ -47,8 +47,9 @@ func NewTestUsers() *testUsers {
 	cfg.Redis.Database = os.Getenv("REDIS_DATABASE")
 
 	// App
-	cfg.App.Version = os.Getenv("APP_VERSION")
 	cfg.App.Stage = os.Getenv("STAGE")
+	cfg.App.Version = os.Getenv("APP_VERSION")
+	cfg.App.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
 	cfg.App.AdminKey = os.Getenv("ADMIN_KEY")
 
 	// New Database

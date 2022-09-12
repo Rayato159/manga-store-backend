@@ -46,9 +46,10 @@ func NewTestAuth() *testAuth {
 	cfg.Redis.Database = os.Getenv("REDIS_DATABASE")
 
 	// App
-	cfg.App.Version = os.Getenv("APP_VERSION")
 	cfg.App.Stage = os.Getenv("STAGE")
+	cfg.App.Version = os.Getenv("APP_VERSION")
 	cfg.App.AdminKey = os.Getenv("ADMIN_KEY")
+	cfg.App.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
 
 	// New Database
 	db, err := databases.NewPostgreSQLDBConnection(cfg)
@@ -86,6 +87,12 @@ func TestStartAuth(t *testing.T) {
 	_ = testAuthController
 
 	// *TestLogin
+	// Case -> 1 username is invalid
+	// Case -> 2 Password is invalid
+	// Case -> 3 Claims type is invalid
+	// Case -> 4 Can't claims the access token
+	// Case -> 5 Can't claims the refresh token
+	// Case -> 6 Can't claims the session token
 }
 
 func (tuc *testUsersCon) Login(cfg *configs.Configs, req *entities.UsersRegisterReq) error {
