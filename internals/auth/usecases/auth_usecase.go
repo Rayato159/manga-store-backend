@@ -53,18 +53,54 @@ func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, req *entitie
 			Role:     string(user.Role),
 		},
 	}
-	accessToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.AccessToken)
-	if err != nil {
-		return nil, err
+
+	accessTokenChan := make(chan string)
+	accessTokenChanErr := make(chan error)
+	refreshTokenChan := make(chan string)
+	refreshTokenChanErr := make(chan error)
+	sessionTokenChan := make(chan string)
+	sessionTokenChanErr := make(chan error)
+
+	go func() {
+		accessToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.AccessToken)
+		accessTokenChanErr <- err
+		accessTokenChan <- accessToken
+		close(accessTokenChanErr)
+		close(accessTokenChan)
+	}()
+	go func() {
+		refreshToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.RefreshToken)
+		refreshTokenChanErr <- err
+		refreshTokenChan <- refreshToken
+		close(refreshTokenChanErr)
+		close(refreshTokenChan)
+	}()
+	go func() {
+		sessionToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.SessionToken)
+		sessionTokenChanErr <- err
+		sessionTokenChan <- sessionToken
+		close(sessionTokenChanErr)
+		close(sessionTokenChan)
+	}()
+
+	accessTokenErr := <-accessTokenChanErr
+	refreshTokenErr := <-refreshTokenChanErr
+	sessionTokenErr := <-sessionTokenChanErr
+
+	if accessTokenErr != nil {
+		return nil, accessTokenErr
 	}
-	refreshToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.RefreshToken)
-	if err != nil {
-		return nil, err
+	if refreshTokenErr != nil {
+		return nil, refreshTokenErr
 	}
-	sessionToken, err := utils.JwtUsersClaims(ctx, cfg, au.AuthRepo, claims, entities.SessionToken)
-	if err != nil {
-		return nil, err
+	if sessionTokenErr != nil {
+		return nil, sessionTokenErr
 	}
+
+	accessToken := <-accessTokenChan
+	refreshToken := <-refreshTokenChan
+	sessionToken := <-sessionTokenChan
+
 	res := &entities.UsersCredentialsRes{
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,

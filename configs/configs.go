@@ -47,10 +47,13 @@ type File struct {
 }
 
 type App struct {
-	Version      string
-	AdminKey     string
-	Stage        string
-	JwtSecretKey string
+	Version                string
+	AdminKey               string
+	Stage                  string
+	JwtSecretKey           string
+	JwtAccessTokenExpires  string
+	JwtRefreshTokenExpires string
+	JwtSessionTokenExpires string
 }
 
 func NewFiberConfig(c *Configs) fiber.Config {

@@ -53,6 +53,9 @@ func NewTestAuth() *testAuth {
 	cfg.App.Version = os.Getenv("APP_VERSION")
 	cfg.App.AdminKey = os.Getenv("ADMIN_KEY")
 	cfg.App.JwtSecretKey = os.Getenv("JWT_SECRET_KEY")
+	cfg.App.JwtAccessTokenExpires = os.Getenv("JWT_ACCESS_TOKEN_EXPIRES")
+	cfg.App.JwtRefreshTokenExpires = os.Getenv("JWT_REFRESH_TOKEN_EXPIRES")
+	cfg.App.JwtSessionTokenExpires = os.Getenv("JWT_SESSION_TOKEN_EXPIRES")
 
 	// New Database
 	db, err := databases.NewPostgreSQLDBConnection(cfg)

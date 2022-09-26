@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"log"
+	"math"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -15,11 +17,12 @@ import (
 func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities.AuthRepository, req *entities.UsersJwtClaimsReq, claimsType entities.ClaimsType) (string, error) {
 	switch claimsType {
 	case entities.AccessToken:
+		accessTokenExpires, _ := strconv.Atoi(cfg.App.JwtAccessTokenExpires)
 		claims := entities.UsersJwtTokenMapClaims{
 			Id:   req.UsersAccessToken.Id,
 			Role: req.UsersAccessToken.Role,
 			RegisteredClaims: jwt.RegisteredClaims{
-				ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Hour)),
+				ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(accessTokenExpires * int(math.Pow10(9))))),
 				IssuedAt:  jwt.NewNumericDate(time.Now()),
 				NotBefore: jwt.NewNumericDate(time.Now()),
 				Issuer:    "access_token",
@@ -38,14 +41,13 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 		return ss, nil
 	case entities.RefreshToken:
 		if req.UsersRefreshToken.ExpiresAt == nil && req.UsersRefreshToken.IssuedAt == nil {
-			expiresAt := time.Now().Add(7 * time.Hour)
+			refreshTokenExpires, _ := strconv.Atoi(cfg.App.JwtRefreshTokenExpires)
+			expiresAt := time.Now().Add(time.Duration(refreshTokenExpires * int(math.Pow10(9))))
 			IssuedAt := time.Now()
 			req.UsersRefreshToken.ExpiresAt = &expiresAt
 			req.UsersRefreshToken.IssuedAt = &IssuedAt
 		} else {
-			expiresAt := req.UsersRefreshToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
 			IssuedAt := time.Now()
-			req.UsersRefreshToken.ExpiresAt = &expiresAt
 			req.UsersRefreshToken.IssuedAt = &IssuedAt
 		}
 
@@ -76,14 +78,13 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 		return ss, nil
 	case entities.SessionToken:
 		if req.UsersSessionToken.ExpiresAt == nil && req.UsersSessionToken.IssuedAt == nil {
-			expiresAt := time.Now().Add(7 * time.Hour)
+			sessionTokenExpires, _ := strconv.Atoi(cfg.App.JwtSessionTokenExpires)
+			expiresAt := time.Now().Add(time.Duration(sessionTokenExpires * int(math.Pow10(9))))
 			IssuedAt := time.Now()
 			req.UsersSessionToken.ExpiresAt = &expiresAt
 			req.UsersSessionToken.IssuedAt = &IssuedAt
 		} else {
-			expiresAt := req.UsersSessionToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
 			IssuedAt := time.Now()
-			req.UsersSessionToken.ExpiresAt = &expiresAt
 			req.UsersSessionToken.IssuedAt = &IssuedAt
 		}
 
