@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -72,17 +73,25 @@ func NewTestAuth() *testAuth {
 
 // Fake user controller
 type testAuthCon struct {
-	TestAuthUse entities.AuthUsecase
+	AuthUse entities.AuthUsecase
 }
 
 func NewTestAuthController(testAuthUse entities.AuthUsecase) *testAuthCon {
 	return &testAuthCon{
-		TestAuthUse: testAuthUse,
+		AuthUse: testAuthUse,
 	}
 }
 
+// Test struct
+type testLogin struct {
+	Label  string
+	Input  *entities.UsersCredentialsReq
+	Expect any
+	Type   string
+}
+
 // Function to tests
-func TestStartAuth(t *testing.T) {
+func TestLogin(t *testing.T) {
 	// Setup and load configs
 	test := NewTestAuth()
 	defer test.Db.Close()
@@ -92,20 +101,75 @@ func TestStartAuth(t *testing.T) {
 	testAuthRepository := _authRepository.NewAuthRepository(test.Db)
 	testAuthUsecase := _authUsecase.NewAuthUsecase(testAuthRepository, usersRepository)
 	testAuthController := NewTestAuthController(testAuthUsecase)
-	_ = testAuthController
 
-	// *TestLogin
-	// Case -> 1 username is invalid
-	// Case -> 2 Password is invalid
-	// Case -> 3 Claims type is invalid
-	// Case -> 4 Can't claims the access token
-	// Case -> 5 Can't claims the refresh token
-	// Case -> 6 Can't claims the session token
+	// Test setup
+	tests := []testLogin{
+		{
+			Label: "error, user not found",
+			Input: &entities.UsersCredentialsReq{
+				Username: "god",
+				Password: "123456",
+			},
+			Expect: "error, user not found",
+			Type:   "error",
+		},
+		{
+			Label: "error, password is invalid",
+			Input: &entities.UsersCredentialsReq{
+				Username: "usertest",
+				Password: "password@false",
+			},
+			Expect: "error, password is invalid",
+			Type:   "error",
+		},
+		{
+			Label: "no error and response is not <nil>",
+			Input: &entities.UsersCredentialsReq{
+				Username: "usertest",
+				Password: "123456",
+			},
+			Expect: "no error and response is not <nil>",
+			Type:   "result",
+		},
+	}
+
+	// Test loop
+	for i := range tests {
+		switch tests[i].Type {
+		case "error":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			if _, err := testAuthController.Login(test.Cfg, tests[i].Input); err.Error() != tests[i].Expect.(string) {
+				t.Errorf("expect: %v but got -> %v", tests[i].Expect.(string), err.Error())
+			}
+		case "result":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			result, err := testAuthController.Login(test.Cfg, tests[i].Input)
+			if err != nil {
+				t.Errorf("expect: %v but got -> %v", "<nil>", err.Error())
+			} else if result == nil {
+				t.Errorf("expect: %v but got -> %v", "result", "<nil>")
+			}
+
+			if result.AccessToken == "" {
+				t.Errorf("expect: %v but got -> %v", "access_token", result.AccessToken)
+			}
+			if result.RefreshToken == "" {
+				t.Errorf("expect: %v but got -> %v", "refresh_token", result.RefreshToken)
+			}
+			if result.SessionToken == "" {
+				t.Errorf("expect: %v but got -> %v", "session_token", result.SessionToken)
+			}
+		}
+	}
 }
 
-func (tuc *testUsersCon) Login(cfg *configs.Configs, req *entities.UsersRegisterReq) error {
+func (tuc *testAuthCon) Login(cfg *configs.Configs, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
 	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
 	defer log.Println(ctx.Value(entities_test.TestUsersCon))
 
-	return nil
+	res, err := tuc.AuthUse.Login(ctx, cfg, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }

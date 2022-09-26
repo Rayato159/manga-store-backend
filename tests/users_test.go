@@ -3,6 +3,7 @@ package tests
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"testing"
@@ -79,8 +80,16 @@ func NewTestUsersController(testUsersUse entities.UsersUsecase) *testUsersCon {
 	}
 }
 
+// Test struct
+type testRegister struct {
+	Label  string
+	Input  *entities.UsersRegisterReq
+	Expect any
+	Type   string
+}
+
 // Function to tests
-func TestStartUsers(t *testing.T) {
+func TestRegister(t *testing.T) {
 	// Setup and load configs
 	test := NewTestUsers()
 	defer test.Db.Close()
@@ -89,107 +98,98 @@ func TestStartUsers(t *testing.T) {
 	testUsersUsecase := _usersUsecase.NewUsersUsecase(testUsersRepository)
 	testUsersController := NewTestUsersController(testUsersUsecase)
 
-	// *TestRegister
-	// Case 1 -> Password and password confirm is not match
-	// Case 2 -> Role is invalid
-	// Case 3 -> Admin key is invalid
-	// Case 4 -> Username is already taken
-	// Case 5 -> Register Success user
-	// Case 6 -> Register Success admin
-	testUsersRegister := make([]entities_test.UsersRegisterTest, 0)
-	for i := 0; i < 6; i++ {
-		testUsersRegisterCase := entities_test.UsersRegisterTest{}
-		testUsersRegisterCase.Input = new(entities.UsersRegisterReq)
-		switch i {
-		case 0:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "johndoe",
-					Password:        "123456",
-					ConfirmPassword: "111111",
-					Role:            "user",
-					AdminKey:        "",
-				},
-				Expect: "error, confirm password is not match",
+	// Test setup
+	tests := []testRegister{
+		{
+			Label: "error, confirm password is not match",
+			Input: &entities.UsersRegisterReq{
+				Username:        "johndoe",
+				Password:        "123456",
+				ConfirmPassword: "111111",
+				Role:            "user",
+				AdminKey:        "",
+			},
+			Expect: "error, confirm password is not match",
+			Type:   "error",
+		},
+		{
+			Label: "error, role is invalid",
+			Input: &entities.UsersRegisterReq{
+				Username:        "johndoe",
+				Password:        "123456",
+				ConfirmPassword: "123456",
+				Role:            "god",
+				AdminKey:        "",
+			},
+			Expect: "error, role is invalid",
+			Type:   "error",
+		},
+		{
+			Label: "error, admin key is invalid",
+			Input: &entities.UsersRegisterReq{
+				Username:        "johndoe",
+				Password:        "123456",
+				ConfirmPassword: "123456",
+				Role:            "admin",
+				AdminKey:        "imadmin",
+			},
+			Expect: "error, admin key is invalid",
+			Type:   "error",
+		},
+		{
+			Label: "error, username has been already taken",
+			Input: &entities.UsersRegisterReq{
+				Username:        "usertest",
+				Password:        "123456",
+				ConfirmPassword: "123456",
+				Role:            "user",
+				AdminKey:        "",
+			},
+			Expect: "error, username has been already taken",
+			Type:   "error",
+		},
+		{
+			Label: "no error, user",
+			Input: &entities.UsersRegisterReq{
+				Username:        "user",
+				Password:        "123456",
+				ConfirmPassword: "123456",
+				Role:            "user",
+				AdminKey:        "",
+			},
+			Expect: "no error, user",
+			Type:   "result",
+		},
+		{
+			Label: "no error, admin",
+			Input: &entities.UsersRegisterReq{
+				Username:        "admin",
+				Password:        "123456",
+				ConfirmPassword: "123456",
+				Role:            "admin",
+				AdminKey:        "UMHNTiXpstOZk3IB",
+			},
+			Expect: "no error, admin",
+			Type:   "result",
+		},
+	}
+
+	for i := range tests {
+		switch tests[i].Type {
+		case "error":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			if _, err := testUsersController.Register(test.Cfg, tests[i].Input); err.Error() != tests[i].Expect.(string) {
+				t.Errorf("expect: %v but got -> %v", tests[i].Expect.(string), err.Error())
 			}
-		case 1:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "johndoe",
-					Password:        "123456",
-					ConfirmPassword: "123456",
-					Role:            "god",
-					AdminKey:        "",
-				},
-				Expect: "error, role is invalid",
-			}
-		case 2:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "johndoe",
-					Password:        "123456",
-					ConfirmPassword: "123456",
-					Role:            "admin",
-					AdminKey:        "imadmin",
-				},
-				Expect: "error, admin key is invalid",
-			}
-		case 3:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "usertest",
-					Password:        "123456",
-					ConfirmPassword: "123456",
-					Role:            "user",
-					AdminKey:        "",
-				},
-				Expect: "error, username has been already taken",
-			}
-		case 4:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "user",
-					Password:        "123456",
-					ConfirmPassword: "123456",
-					Role:            "user",
-					AdminKey:        "",
-				},
-				Expect: "user",
-			}
-		case 5:
-			testUsersRegisterCase = entities_test.UsersRegisterTest{
-				Input: &entities.UsersRegisterReq{
-					Username:        "admin",
-					Password:        "123456",
-					ConfirmPassword: "123456",
-					Role:            "admin",
-					AdminKey:        "UMHNTiXpstOZk3IB",
-				},
-				Expect: "admin",
+		case "result":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			result, err := testUsersController.Register(test.Cfg, tests[i].Input)
+			if err != nil {
+				t.Errorf("expect: %v but got -> %v", "<nil>", err.Error())
+			} else if result == nil {
+				t.Errorf("expect: %v but got -> %v", "result", "<nil>")
 			}
 		}
-		testUsersRegister = append(testUsersRegister, testUsersRegisterCase)
-	}
-
-	for i := 0; i < 4; i++ {
-		_, err := testUsersController.Register(test.Cfg, testUsersRegister[i].Input)
-		if err.Error() != testUsersRegister[i].Expect {
-			t.Errorf("expect: <%v> but got -> <%v>", testUsersRegister[i].Expect, err.Error())
-		}
-	}
-
-	result5, err5 := testUsersController.Register(test.Cfg, testUsersRegister[4].Input)
-	if err5 != nil {
-		t.Errorf("expect: <nil> but got -> <%v>", err5.Error())
-	} else if result5.Username != "user" {
-		t.Errorf("expect: <%v> but got -> <%v>", result5.Username, err5.Error())
-	}
-
-	result6, err6 := testUsersController.Register(test.Cfg, testUsersRegister[5].Input)
-	if err6 != nil {
-		t.Errorf("expect: <nil> but got -> <%v>", err6.Error())
-	} else if result6.Username != "admin" {
-		t.Errorf("expect: <%v> but got -> <%v>", result6.Username, err6.Error())
 	}
 }
 

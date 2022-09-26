@@ -69,7 +69,7 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 		ss, err := token.SignedString([]byte(cfg.App.JwtSecretKey))
 		if err != nil {
 			log.Println(err.Error())
-			return "", errors.New("error, can't claims an access token")
+			return "", errors.New("error, can't claims an refresh token")
 		}
 
 		if err := authRepo.UpdateUserRefreshToken(ctx, req.UsersRefreshToken.Id, ss); err != nil {
@@ -107,7 +107,7 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 		ss, err := token.SignedString([]byte(cfg.App.JwtSecretKey))
 		if err != nil {
 			log.Println(err.Error())
-			return "", errors.New("error, can't claims an access token")
+			return "", errors.New("error, can't claims an session token")
 		}
 		return ss, nil
 	default:
