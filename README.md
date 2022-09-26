@@ -107,7 +107,7 @@ docker run --name manga-store-redis -p 6379:6379 -d redis
 <strong>Migrate Up</strong>
 
 ```
-migrate -database 'postgres://postgres:123456@0.0.0.0:3435/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose up
+migrate -database 'postgres://postgres:123456@0.0.0.0:<your_port>/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose up
 ```
 </li>
 
@@ -116,7 +116,7 @@ migrate -database 'postgres://postgres:123456@0.0.0.0:3435/manga_store_db_<your_
 <strong>Migrate Down</strong>
 
 ```
-migrate -database 'postgres://postgres:123456@0.0.0.0:3435/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose down
+migrate -database 'postgres://postgres:123456@0.0.0.0:<your_port>/manga_store_db_<your_stage>?sslmode=disable' -source file://to-the-path -verbose down
 ```
 </li>
 </ul>
