@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"context"
 	"errors"
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
@@ -10,7 +12,7 @@ import (
 	"github.com/rayato159/manga-store/internals/entities"
 )
 
-func JwtUsersClaims(cfg *configs.Configs, req *entities.UsersJwtClaimsReq, claimsType entities.ClaimsType) (string, error) {
+func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities.AuthRepository, req *entities.UsersJwtClaimsReq, claimsType entities.ClaimsType) (string, error) {
 	switch claimsType {
 	case entities.AccessToken:
 		claims := entities.UsersJwtTokenMapClaims{
@@ -26,20 +28,27 @@ func JwtUsersClaims(cfg *configs.Configs, req *entities.UsersJwtClaimsReq, claim
 				Audience:  []string{"users"},
 			},
 		}
+
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		ss, err := token.SignedString(cfg.App.JwtSecretKey)
+		ss, err := token.SignedString([]byte(cfg.App.JwtSecretKey))
 		if err != nil {
+			log.Println(err.Error())
 			return "", errors.New("error, can't claims an access token")
 		}
 		return ss, nil
 	case entities.RefreshToken:
 		if req.UsersRefreshToken.ExpiresAt == nil && req.UsersRefreshToken.IssuedAt == nil {
-			*req.UsersRefreshToken.ExpiresAt = time.Now().Add(7 * time.Hour)
-			*req.UsersRefreshToken.IssuedAt = time.Now()
+			expiresAt := time.Now().Add(7 * time.Hour)
+			IssuedAt := time.Now()
+			req.UsersRefreshToken.ExpiresAt = &expiresAt
+			req.UsersRefreshToken.IssuedAt = &IssuedAt
 		} else {
-			*req.UsersRefreshToken.ExpiresAt = req.UsersRefreshToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
-			*req.UsersRefreshToken.IssuedAt = time.Now()
+			expiresAt := req.UsersRefreshToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
+			IssuedAt := time.Now()
+			req.UsersRefreshToken.ExpiresAt = &expiresAt
+			req.UsersRefreshToken.IssuedAt = &IssuedAt
 		}
+
 		claims := entities.UsersJwtTokenMapClaims{
 			Id:   req.UsersRefreshToken.Id,
 			Role: req.UsersRefreshToken.Role,
@@ -53,20 +62,31 @@ func JwtUsersClaims(cfg *configs.Configs, req *entities.UsersJwtClaimsReq, claim
 				Audience:  []string{"users"},
 			},
 		}
+
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		ss, err := token.SignedString(cfg.App.JwtSecretKey)
+		ss, err := token.SignedString([]byte(cfg.App.JwtSecretKey))
 		if err != nil {
+			log.Println(err.Error())
 			return "", errors.New("error, can't claims an access token")
+		}
+
+		if err := authRepo.UpdateUserRefreshToken(ctx, req.UsersRefreshToken.Id, ss); err != nil {
+			return "", err
 		}
 		return ss, nil
 	case entities.SessionToken:
 		if req.UsersSessionToken.ExpiresAt == nil && req.UsersSessionToken.IssuedAt == nil {
-			*req.UsersSessionToken.ExpiresAt = time.Now().Add(7 * time.Hour)
-			*req.UsersSessionToken.IssuedAt = time.Now()
+			expiresAt := time.Now().Add(7 * time.Hour)
+			IssuedAt := time.Now()
+			req.UsersSessionToken.ExpiresAt = &expiresAt
+			req.UsersSessionToken.IssuedAt = &IssuedAt
 		} else {
-			*req.UsersSessionToken.ExpiresAt = req.UsersSessionToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
-			*req.UsersSessionToken.IssuedAt = time.Now()
+			expiresAt := req.UsersSessionToken.ExpiresAt.Add(-time.Duration(time.Now().Unix()))
+			IssuedAt := time.Now()
+			req.UsersSessionToken.ExpiresAt = &expiresAt
+			req.UsersSessionToken.IssuedAt = &IssuedAt
 		}
+
 		claims := entities.UsersJwtSessionMapClaims{
 			Id:       req.UsersSessionToken.Id,
 			Username: req.UsersSessionToken.Username,
@@ -81,9 +101,11 @@ func JwtUsersClaims(cfg *configs.Configs, req *entities.UsersJwtClaimsReq, claim
 				Audience:  []string{"users"},
 			},
 		}
+
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-		ss, err := token.SignedString(cfg.App.JwtSecretKey)
+		ss, err := token.SignedString([]byte(cfg.App.JwtSecretKey))
 		if err != nil {
+			log.Println(err.Error())
 			return "", errors.New("error, can't claims an access token")
 		}
 		return ss, nil

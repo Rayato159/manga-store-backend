@@ -19,7 +19,7 @@ func NewUsersRepository(db *sqlx.DB) entities.UsersRepository {
 	}
 }
 
-func (ur *usersRepo) FindOneUser(ctx context.Context, req string) (*entities.UsersCredentialsReq, error) {
+func (ur *usersRepo) FindOneUser(ctx context.Context, username string) (*entities.UsersCredentialsReq, error) {
 	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.FindOneUser")
 	defer log.Println(ctx.Value(entities.UsersRep))
 
@@ -31,7 +31,28 @@ func (ur *usersRepo) FindOneUser(ctx context.Context, req string) (*entities.Use
 	WHERE "username" = $1`
 
 	user := new(entities.UsersCredentialsReq)
-	if err := ur.Db.Get(user, query, req); err != nil {
+	if err := ur.Db.Get(user, query, username); err != nil {
+		log.Println(err.Error())
+		return user, errors.New("error, user not found")
+	}
+	return user, nil
+}
+
+func (ur *usersRepo) GetUserInfo(ctx context.Context, username string) (*entities.UsersInfo, error) {
+	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.GetUserInfo")
+	defer log.Println(ctx.Value(entities.UsersRep))
+
+	query := `
+	SELECT 
+	COALESCE("id"::VARCHAR, '') AS "id",
+	COALESCE("username", '') AS "username", 
+	COALESCE("password", '') AS "password",
+	COALESCE("role"::VARCHAR, '') AS "role"
+	FROM "users" 
+	WHERE "username" = $1`
+
+	user := new(entities.UsersInfo)
+	if err := ur.Db.Get(user, query, username); err != nil {
 		log.Println(err.Error())
 		return user, errors.New("error, user not found")
 	}
@@ -53,7 +74,7 @@ func (ur *usersRepo) Register(ctx context.Context, req *entities.UsersRegisterRe
 		:password,
 		:role
 	)
-	RETURNING "username", "created_at", "updated_at";
+	RETURNING "id", "username", "created_at", "updated_at";
 	`
 
 	tx, err := ur.Db.BeginTxx(ctx, nil)

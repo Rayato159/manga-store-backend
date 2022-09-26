@@ -8,8 +8,11 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/configs"
+
 	_authRepository "github.com/rayato159/manga-store/internals/auth/repositories"
 	_authUsecase "github.com/rayato159/manga-store/internals/auth/usecases"
+	_usersRepository "github.com/rayato159/manga-store/internals/users/repositories"
+
 	"github.com/rayato159/manga-store/internals/entities"
 	"github.com/rayato159/manga-store/pkg/databases"
 	"github.com/rayato159/manga-store/pkg/utils"
@@ -81,8 +84,10 @@ func TestStartAuth(t *testing.T) {
 	test := NewTestAuth()
 	defer test.Db.Close()
 
+	usersRepository := _usersRepository.NewUsersRepository(test.Db)
+
 	testAuthRepository := _authRepository.NewAuthRepository(test.Db)
-	testAuthUsecase := _authUsecase.NewAuthUsecase(testAuthRepository)
+	testAuthUsecase := _authUsecase.NewAuthUsecase(testAuthRepository, usersRepository)
 	testAuthController := NewTestAuthController(testAuthUsecase)
 	_ = testAuthController
 

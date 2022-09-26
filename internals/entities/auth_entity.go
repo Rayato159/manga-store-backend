@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/rayato159/manga-store/configs"
 )
 
 type AuthContext string
@@ -24,10 +25,11 @@ const (
 )
 
 type AuthRepository interface {
+	UpdateUserRefreshToken(ctx context.Context, userId string, token string) error
 }
 
 type AuthUsecase interface {
-	Login(ctx context.Context, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
+	Login(ctx context.Context, cfg *configs.Configs, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
 }
 
 type UsersCredentialsReq struct {

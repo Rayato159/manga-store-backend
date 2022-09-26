@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/middlewares"
 
 	_monitorsHttp "github.com/rayato159/manga-store/internals/monitors/controllers/http"
 	_monitorsUsecase "github.com/rayato159/manga-store/internals/monitors/usecases"
@@ -17,24 +18,11 @@ import (
 	_authUsecase "github.com/rayato159/manga-store/internals/auth/usecases"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func (s *Server) MapHandlers() error {
-	// For save a log to file
-	s.Fiber.Use(logger.New(logger.Config{
-		Format:     "${time} | ${pid} | ${ip} | ${status} | ${method} ${path}\n",
-		TimeFormat: "2006-01-02T15:04:05",
-		TimeZone:   "Thailand/Bangkok",
-		Output:     s.File,
-	}))
-
-	// For console a log
-	s.Fiber.Use(logger.New(logger.Config{
-		Format:     "${time} | ${pid} | ${ip} | ${status} | ${method} ${path}\n",
-		TimeFormat: "2006-01-02T15:04:05",
-		TimeZone:   "Thailand/Bangkok",
-	}))
+	middlewares.NewCorsFiberHandler(s.Fiber)
+	middlewares.NewFiberLoggerHandler(s.Fiber, s.File)
 
 	// Group a version
 	v1 := s.Fiber.Group("/v1")
@@ -52,7 +40,7 @@ func (s *Server) MapHandlers() error {
 	//* Auth group
 	authGroup := v1.Group("/auth")
 	authRepository := _authRepository.NewAuthRepository(s.Db)
-	authUsecase := _authUsecase.NewAuthUsecase(authRepository)
+	authUsecase := _authUsecase.NewAuthUsecase(authRepository, usersRepository)
 	_authHttp.NewAuthController(authGroup, s.Cfg, authUsecase, usersUsecase)
 
 	// End point not found response
