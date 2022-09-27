@@ -98,7 +98,7 @@ docker run --name manga-store-redis -p 6379:6379 -d redis
 </ul>
 
 <h3>💾 Database Schema</h3>
-<img src="./assets/screenshots/schema_v6.png">
+<img src="./assets/screenshots/schema_v7.png">
 
 <h3>🪜 Database Migration</h3>
 <ul>

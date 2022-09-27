@@ -65,6 +65,8 @@ CREATE TABLE "coupons" (
   "discount" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "type" coupon_type NOT NULL,
   "qty" INT NOT NULL DEFAULT 0,
+  "lower_limit" DOUBLE PRECISION NOT NULL DEFAULT 0,
+  "upper_limit" DOUBLE PRECISION NOT NULL DEFAULT 0,
   "created_at" TIMESTAMP NOT NULL DEFAULT now(),
   "updated_at" TIMESTAMP NOT NULL DEFAULT now()
 );

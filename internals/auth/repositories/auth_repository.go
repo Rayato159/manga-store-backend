@@ -19,19 +19,36 @@ func NewAuthRepository(db *sqlx.DB) entities.AuthRepository {
 	}
 }
 
-func (ar *authRepo) UpdateUserRefreshToken(ctx context.Context, userId string, token string) error {
+func (ar *authRepo) UpdateUserRefreshToken(ctx context.Context, reqType string, userId string, token string, newToken string) error {
 	ctx = context.WithValue(ctx, entities.AuthRep, "Rep.UpdateUserRefreshToken")
 	defer log.Println(ctx.Value(entities.AuthRep))
 
-	query := `
-	UPDATE "users"
-	SET
-	"refresh_token" = $2
-	WHERE "id" = $1`
+	switch reqType {
+	case "user_id":
+		_ = newToken
+		query := `
+		UPDATE "users"
+		SET
+		"refresh_token" = $2
+		WHERE "id" = $1`
 
-	if _, err := ar.Db.Exec(query, userId, token); err != nil {
-		log.Println(err.Error())
-		return errors.New("error, user not found")
+		if _, err := ar.Db.Exec(query, userId, token); err != nil {
+			log.Println(err.Error())
+			return errors.New("error, user not found")
+		}
+	case "refresh_toekn":
+		query := `
+		UPDATE "users"
+		SET
+		"refresh_token" = $2
+		WHERE "refresh_token" = $1`
+
+		if _, err := ar.Db.Exec(query, token, newToken); err != nil {
+			log.Println(err.Error())
+			return errors.New("error, user not found")
+		}
+	default:
+		return errors.New("error, request type is invalid")
 	}
 	return nil
 }

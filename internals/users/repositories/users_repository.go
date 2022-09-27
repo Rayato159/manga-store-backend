@@ -38,25 +38,46 @@ func (ur *usersRepo) FindOneUser(ctx context.Context, username string) (*entitie
 	return user, nil
 }
 
-func (ur *usersRepo) GetUserInfo(ctx context.Context, username string) (*entities.UsersInfo, error) {
+func (ur *usersRepo) GetUserInfo(ctx context.Context, reqType string, username string, refreshToken string) (*entities.UsersInfo, error) {
 	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.GetUserInfo")
 	defer log.Println(ctx.Value(entities.UsersRep))
 
-	query := `
-	SELECT 
-	COALESCE("id"::VARCHAR, '') AS "id",
-	COALESCE("username", '') AS "username", 
-	COALESCE("password", '') AS "password",
-	COALESCE("role"::VARCHAR, '') AS "role"
-	FROM "users" 
-	WHERE "username" = $1`
+	switch reqType {
+	case "username":
+		query := `
+		SELECT 
+		COALESCE("id"::VARCHAR, '') AS "id",
+		COALESCE("username", '') AS "username", 
+		COALESCE("password", '') AS "password",
+		COALESCE("role"::VARCHAR, '') AS "role"
+		FROM "users" 
+		WHERE "username" = $1`
 
-	user := new(entities.UsersInfo)
-	if err := ur.Db.Get(user, query, username); err != nil {
-		log.Println(err.Error())
-		return user, errors.New("error, user not found")
+		user := new(entities.UsersInfo)
+		if err := ur.Db.Get(user, query, username); err != nil {
+			log.Println(err.Error())
+			return user, errors.New("error, user not found")
+		}
+		return user, nil
+	case "refresh_token":
+		query := `
+		SELECT 
+		COALESCE("id"::VARCHAR, '') AS "id",
+		COALESCE("username", '') AS "username", 
+		COALESCE("password", '') AS "password",
+		COALESCE("role"::VARCHAR, '') AS "role"
+		FROM "users" 
+		WHERE "refresh_token" = $1`
+
+		user := new(entities.UsersInfo)
+		if err := ur.Db.Get(user, query, refreshToken); err != nil {
+			log.Println(err.Error())
+			return user, errors.New("error, user not found")
+		}
+		return user, nil
+	default:
+		return nil, errors.New("error, request type is invalid")
 	}
-	return user, nil
 }
 
 func (ur *usersRepo) Register(ctx context.Context, req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {

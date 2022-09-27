@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"math"
 	"strconv"
@@ -72,7 +73,7 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 			return "", errors.New("error, can't claims an refresh token")
 		}
 
-		if err := authRepo.UpdateUserRefreshToken(ctx, req.UsersRefreshToken.Id, ss); err != nil {
+		if err := authRepo.UpdateUserRefreshToken(ctx, "user_id", req.UsersRefreshToken.Id, ss, ""); err != nil {
 			return "", err
 		}
 		return ss, nil
@@ -113,4 +114,24 @@ func JwtUsersClaims(ctx context.Context, cfg *configs.Configs, authRepo entities
 	default:
 		return "", errors.New("error, claims type is invalid")
 	}
+}
+
+func JwtExtractPayload(ctx context.Context, cfg *configs.Configs, fieldName string, tokenString string) (any, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Don't forget to validate the alg is what you expect:
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("error, unexpected signing method: %v", token.Header["alg"])
+		}
+		// hmacSampleSecret is a []byte containing your secret, e.g. []byte("my_secret_key")
+		return []byte(cfg.App.JwtSecretKey), nil
+	})
+	if err != nil {
+		log.Println(err.Error())
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims[fieldName], nil
+	}
+	return "", errors.New("error, token is invalid")
 }

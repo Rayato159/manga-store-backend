@@ -25,11 +25,12 @@ const (
 )
 
 type AuthRepository interface {
-	UpdateUserRefreshToken(ctx context.Context, userId string, token string) error
+	UpdateUserRefreshToken(ctx context.Context, reqType string, userId string, token string, newToken string) error
 }
 
 type AuthUsecase interface {
 	Login(ctx context.Context, cfg *configs.Configs, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
+	RefreshToken(ctx context.Context, cfg *configs.Configs, refreshToken string) (*UsersCredentialsRes, error)
 }
 
 type UsersCredentialsReq struct {
@@ -80,4 +81,8 @@ type UsersJwtSessionMapClaims struct {
 	Username string `db:"username" json:"username"`
 	Role     string `db:"role" json:"role"`
 	jwt.RegisteredClaims
+}
+
+type RefreshTokenReq struct {
+	RefreshToken string `db:"refresh_token" json:"refresh_token" form:"refresh_token"`
 }
