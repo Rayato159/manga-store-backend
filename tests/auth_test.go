@@ -2,6 +2,7 @@ package tests
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -90,6 +91,13 @@ type testLogin struct {
 	Type   string
 }
 
+type testRefreshToken struct {
+	Label  string
+	Input  *entities.RefreshTokenReq
+	Expect any
+	Type   string
+}
+
 // Function to tests
 func TestLogin(t *testing.T) {
 	// Setup and load configs
@@ -163,11 +171,95 @@ func TestLogin(t *testing.T) {
 	}
 }
 
+func TestRefreshToken(t *testing.T) {
+	// Setup and load configs
+	test := NewTestAuth()
+	defer test.Db.Close()
+
+	usersRepository := _usersRepository.NewUsersRepository(test.Db)
+
+	testAuthRepository := _authRepository.NewAuthRepository(test.Db)
+	testAuthUsecase := _authUsecase.NewAuthUsecase(testAuthRepository, usersRepository)
+	testAuthController := NewTestAuthController(testAuthUsecase)
+
+	// Test setup
+	tests := []testRefreshToken{
+		{
+			Label: "error, refresh token is invalid",
+			Input: &entities.RefreshTokenReq{
+				RefreshToken: "",
+			},
+			Expect: "error, refresh token is invalid",
+			Type:   "error",
+		},
+		{
+			Label: "error, unexpected signing method: HS256",
+			Input: &entities.RefreshTokenReq{
+				RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5.eyJpZCI6ImM2ZTQwODU4LTQyOTMtNGE1MS04NGU2LWRhNTEwNmUxY2E0NSIsInJvbGUiOiJ1c2VyIiwiaXNzIjoidXNlcnNfcmVmcmVzaF90b2tlbiIsInN1YiI6InVzZXJzIiwiYXVkIjpbInVzZXJzIl0sImV4cCI6MTY2NDg5NzA1NiwibmJmIjoxNjY0MjkyMjc4LCJpYXQiOjE2NjQyOTIyNzgsImp0aSI6IjI0NGY2MmQyLTQxNTAtNDA0MS1hMWY4LTY1MDljYjY0MGZiZiJ9.RSh2sha2dxkE4XN2wbPlRgqoNvmfZ5ejS8d5Rwup1ws",
+			},
+			Expect: "error, unexpected signing method: HS256",
+			Type:   "error",
+		},
+		{
+			Label: "no error and response is not <nil>",
+			Input: &entities.RefreshTokenReq{
+				RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijk3N2E0ZWRlLWQwZWQtNDVmMC05MzUyLTU3MjBlMDY3ZjI0YiIsInJvbGUiOiJ1c2VyIiwiaXNzIjoidXNlcnNfcmVmcmVzaF90b2tlbiIsInN1YiI6InVzZXJzIiwiYXVkIjpbInVzZXJzIl0sImV4cCI6MzgxMTc3NzQ3MywibmJmIjoxNjY0MjkzODI2LCJpYXQiOjE2NjQyOTM4MjYsImp0aSI6ImQ0MTljZWNjLWIwMjEtNDFlMS1iMTQwLWY2ZWY1YWNiN2I3YSJ9.d0syYFsB3QlIG2PpgOvwXlPba1jWk8f3J0NdxnsLl_M",
+			},
+			Expect: "no error and response is not <nil>",
+			Type:   "result",
+		},
+	}
+
+	// Test loop
+	for i := range tests {
+		switch tests[i].Type {
+		case "error":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			if _, err := testAuthController.RefreshToken(test.Cfg, tests[i].Input); err.Error() != tests[i].Expect.(string) {
+				t.Errorf("expect: %v but got -> %v", tests[i].Expect.(string), err.Error())
+			}
+		case "result":
+			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
+			result, err := testAuthController.RefreshToken(test.Cfg, tests[i].Input)
+			if err != nil {
+				t.Errorf("expect: %v but got -> %v", "<nil>", err.Error())
+			} else if result == nil {
+				t.Errorf("expect: %v but got -> %v", "result", "<nil>")
+			}
+
+			if result.AccessToken == "" {
+				t.Errorf("expect: %v but got -> %v", "access_token", result.AccessToken)
+			}
+			if result.RefreshToken == "" {
+				t.Errorf("expect: %v but got -> %v", "refresh_token", result.RefreshToken)
+			}
+			if result.SessionToken == "" {
+				t.Errorf("expect: %v but got -> %v", "session_token", result.SessionToken)
+			}
+		}
+	}
+}
+
 func (tuc *testAuthCon) Login(cfg *configs.Configs, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
 	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
 	defer log.Println(ctx.Value(entities_test.TestUsersCon))
 
 	res, err := tuc.AuthUse.Login(ctx, cfg, req)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+func (tuc *testAuthCon) RefreshToken(cfg *configs.Configs, req *entities.RefreshTokenReq) (*entities.UsersCredentialsRes, error) {
+	ctx := context.WithValue(context.TODO(), entities.AuthCon, "Con.RefreshToken")
+	defer log.Println(ctx.Value(entities.AuthCon))
+
+	if req.RefreshToken == "" {
+		return nil, errors.New("error, refresh token is invalid")
+	}
+
+	res, err := tuc.AuthUse.RefreshToken(ctx, cfg, req.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
