@@ -193,11 +193,11 @@ func TestRefreshToken(t *testing.T) {
 			Type:   "error",
 		},
 		{
-			Label: "error, unexpected signing method: HS256",
+			Label: "error, user not found",
 			Input: &entities.RefreshTokenReq{
 				RefreshToken: "eyJhbGciOiJIUzI1NiIsInR5.eyJpZCI6ImM2ZTQwODU4LTQyOTMtNGE1MS04NGU2LWRhNTEwNmUxY2E0NSIsInJvbGUiOiJ1c2VyIiwiaXNzIjoidXNlcnNfcmVmcmVzaF90b2tlbiIsInN1YiI6InVzZXJzIiwiYXVkIjpbInVzZXJzIl0sImV4cCI6MTY2NDg5NzA1NiwibmJmIjoxNjY0MjkyMjc4LCJpYXQiOjE2NjQyOTIyNzgsImp0aSI6IjI0NGY2MmQyLTQxNTAtNDA0MS1hMWY4LTY1MDljYjY0MGZiZiJ9.RSh2sha2dxkE4XN2wbPlRgqoNvmfZ5ejS8d5Rwup1ws",
 			},
-			Expect: "error, unexpected signing method: HS256",
+			Expect: "error, user not found",
 			Type:   "error",
 		},
 		{
