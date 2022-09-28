@@ -41,7 +41,7 @@ func (s *Server) MapHandlers() error {
 	authGroup := v1.Group("/auth")
 	authRepository := _authRepository.NewAuthRepository(s.Db)
 	authUsecase := _authUsecase.NewAuthUsecase(authRepository, usersRepository)
-	_authHttp.NewAuthController(authGroup, s.Cfg, authUsecase, usersUsecase)
+	_authHttp.NewAuthController(authGroup, s.Cfg, s.Redis, authUsecase, usersUsecase)
 
 	// End point not found response
 	s.Fiber.Use(func(c *fiber.Ctx) error {

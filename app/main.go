@@ -65,7 +65,9 @@ func main() {
 	defer file.Close()
 
 	rdb := cache.NewRedisConnection(cfg)
-	defer rdb.Conn().Close()
+	if rdb != nil {
+		defer rdb.Conn().Close()
+	}
 
 	s := servers.NewServer(cfg, db, rdb, file)
 	s.Start()

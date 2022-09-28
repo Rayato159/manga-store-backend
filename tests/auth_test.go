@@ -8,6 +8,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/configs"
 
@@ -16,6 +17,7 @@ import (
 	_usersRepository "github.com/rayato159/manga-store/internals/users/repositories"
 
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/cache"
 	"github.com/rayato159/manga-store/pkg/databases"
 	"github.com/rayato159/manga-store/pkg/utils"
 	"github.com/rayato159/manga-store/tests/entities_test"
@@ -23,8 +25,9 @@ import (
 
 // Test users class
 type testAuth struct {
-	Cfg *configs.Configs
-	Db  *sqlx.DB
+	Cfg   *configs.Configs
+	Redis *redis.Client
+	Db    *sqlx.DB
 }
 
 func NewTestAuth() *testAuth {
@@ -66,9 +69,12 @@ func NewTestAuth() *testAuth {
 		defer db.Close()
 	}
 
+	rdb := cache.NewRedisConnection(cfg)
+
 	return &testAuth{
-		Cfg: cfg,
-		Db:  db,
+		Cfg:   cfg,
+		Redis: rdb,
+		Db:    db,
 	}
 }
 
@@ -103,6 +109,9 @@ func TestLogin(t *testing.T) {
 	// Setup and load configs
 	test := NewTestAuth()
 	defer test.Db.Close()
+	if test.Redis != nil {
+		defer test.Redis.Conn().Close()
+	}
 
 	usersRepository := _usersRepository.NewUsersRepository(test.Db)
 
@@ -146,12 +155,12 @@ func TestLogin(t *testing.T) {
 		switch tests[i].Type {
 		case "error":
 			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
-			if _, err := testAuthController.Login(test.Cfg, tests[i].Input); err.Error() != tests[i].Expect.(string) {
+			if _, err := testAuthController.Login(test.Cfg, test.Redis, tests[i].Input); err.Error() != tests[i].Expect.(string) {
 				t.Errorf("expect: %v but got -> %v", tests[i].Expect.(string), err.Error())
 			}
 		case "result":
 			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
-			result, err := testAuthController.Login(test.Cfg, tests[i].Input)
+			result, err := testAuthController.Login(test.Cfg, test.Redis, tests[i].Input)
 			if err != nil {
 				t.Errorf("expect: %v but got -> %v", "<nil>", err.Error())
 			} else if result == nil {
@@ -175,6 +184,9 @@ func TestRefreshToken(t *testing.T) {
 	// Setup and load configs
 	test := NewTestAuth()
 	defer test.Db.Close()
+	if test.Redis != nil {
+		defer test.Redis.Conn().Close()
+	}
 
 	usersRepository := _usersRepository.NewUsersRepository(test.Db)
 
@@ -215,12 +227,12 @@ func TestRefreshToken(t *testing.T) {
 		switch tests[i].Type {
 		case "error":
 			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
-			if _, err := testAuthController.RefreshToken(test.Cfg, tests[i].Input); err.Error() != tests[i].Expect.(string) {
+			if _, err := testAuthController.RefreshToken(test.Cfg, test.Redis, tests[i].Input); err.Error() != tests[i].Expect.(string) {
 				t.Errorf("expect: %v but got -> %v", tests[i].Expect.(string), err.Error())
 			}
 		case "result":
 			fmt.Printf("case: %v -> %v\n", i+1, tests[i].Label)
-			result, err := testAuthController.RefreshToken(test.Cfg, tests[i].Input)
+			result, err := testAuthController.RefreshToken(test.Cfg, test.Redis, tests[i].Input)
 			if err != nil {
 				t.Errorf("expect: %v but got -> %v", "<nil>", err.Error())
 			} else if result == nil {
@@ -240,18 +252,18 @@ func TestRefreshToken(t *testing.T) {
 	}
 }
 
-func (tuc *testAuthCon) Login(cfg *configs.Configs, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
+func (tuc *testAuthCon) Login(cfg *configs.Configs, rdb *redis.Client, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
 	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
 	defer log.Println(ctx.Value(entities_test.TestUsersCon))
 
-	res, err := tuc.AuthUse.Login(ctx, cfg, req)
+	res, err := tuc.AuthUse.Login(ctx, cfg, rdb, req)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-func (tuc *testAuthCon) RefreshToken(cfg *configs.Configs, req *entities.RefreshTokenReq) (*entities.UsersCredentialsRes, error) {
+func (tuc *testAuthCon) RefreshToken(cfg *configs.Configs, rdb *redis.Client, req *entities.RefreshTokenReq) (*entities.UsersCredentialsRes, error) {
 	ctx := context.WithValue(context.TODO(), entities.AuthCon, "Con.RefreshToken")
 	defer log.Println(ctx.Value(entities.AuthCon))
 
@@ -259,7 +271,7 @@ func (tuc *testAuthCon) RefreshToken(cfg *configs.Configs, req *entities.Refresh
 		return nil, errors.New("error, refresh token is invalid")
 	}
 
-	res, err := tuc.AuthUse.RefreshToken(ctx, cfg, req.RefreshToken)
+	res, err := tuc.AuthUse.RefreshToken(ctx, cfg, rdb, req.RefreshToken)
 	if err != nil {
 		return nil, err
 	}
