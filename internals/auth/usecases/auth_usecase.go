@@ -28,14 +28,14 @@ func NewAuthUsecase(authRepo entities.AuthRepository, usersRepo entities.UsersRe
 	}
 }
 
-func (au *authUse) getLoginCache(ctx context.Context, rdb *redis.Client, username string) (*entities.UsersInfo, error) {
+func (au *authUse) getUserInfoCache(ctx context.Context, rdb *redis.Client, key string) (*entities.UsersInfo, error) {
 	ctx = context.WithValue(ctx, entities.AuthCon, "Con.getLoginCache")
 	defer log.Println(ctx.Value(entities.AuthCon))
 
-	val, err := rdb.Get(ctx, username).Result()
+	val, err := rdb.Get(ctx, key).Result()
 	if err != nil || val == "" {
 		log.Println(err.Error())
-		return nil, fmt.Errorf("error, can't get value of key: %v", username)
+		return nil, fmt.Errorf("error, can't get value of key: %v", key)
 	}
 
 	user := new(entities.UsersInfo)
@@ -46,7 +46,7 @@ func (au *authUse) getLoginCache(ctx context.Context, rdb *redis.Client, usernam
 	return user, nil
 }
 
-func (au *authUse) setLoginCache(ctx context.Context, rdb *redis.Client, key string, data any) error {
+func (au *authUse) setUserInfoCache(ctx context.Context, rdb *redis.Client, key string, data any) error {
 	ctx = context.WithValue(ctx, entities.AuthCon, "Con.setLoginCache")
 	defer log.Println(ctx.Value(entities.AuthCon))
 
@@ -66,14 +66,23 @@ func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, rdb *redis.C
 	ctx = context.WithValue(ctx, entities.AuthUse, "Use.Login")
 	defer log.Println(ctx.Value(entities.AuthUse))
 
-	user, err := au.getLoginCache(ctx, rdb, req.Username)
-	if err != nil {
-		// Find user by username
+	user := new(entities.UsersInfo)
+	var err error
+	if rdb != nil {
+		user, err = au.getUserInfoCache(ctx, rdb, req.Username)
+		if err != nil {
+			// Find user by username
+			user, err = au.UsersRepo.GetUserInfo(ctx, "username", req.Username, "")
+			if err != nil {
+				return nil, err
+			}
+			if err = au.setUserInfoCache(ctx, rdb, req.Username, user); err != nil {
+				return nil, err
+			}
+		}
+	} else {
 		user, err = au.UsersRepo.GetUserInfo(ctx, "username", req.Username, "")
 		if err != nil {
-			return nil, err
-		}
-		if err = au.setLoginCache(ctx, rdb, req.Username, user); err != nil {
 			return nil, err
 		}
 	}
@@ -154,13 +163,29 @@ func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, rdb *redis.C
 	return res, nil
 }
 
-func (au *authUse) RefreshToken(ctx context.Context, cfg *configs.Configs, resfreshToken string) (*entities.UsersCredentialsRes, error) {
+func (au *authUse) RefreshToken(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, resfreshToken string) (*entities.UsersCredentialsRes, error) {
 	ctx = context.WithValue(ctx, entities.AuthUse, "Use.RefreshToken")
 	defer log.Println(ctx.Value(entities.AuthUse))
 
-	user, err := au.UsersRepo.GetUserInfo(ctx, "refresh_token", "", resfreshToken)
-	if err != nil {
-		return nil, err
+	user := new(entities.UsersInfo)
+	var err error
+	if rdb != nil {
+		user, err = au.getUserInfoCache(ctx, rdb, resfreshToken)
+		if err != nil {
+			// Find user by username
+			user, err = au.UsersRepo.GetUserInfo(ctx, "refresh_token", "", resfreshToken)
+			if err != nil {
+				return nil, err
+			}
+			if err = au.setUserInfoCache(ctx, rdb, resfreshToken, user); err != nil {
+				return nil, err
+			}
+		}
+	} else {
+		user, err = au.UsersRepo.GetUserInfo(ctx, "refresh_token", "", resfreshToken)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	expiresAtString, err := utils.JwtExtractPayload(ctx, cfg, "exp", resfreshToken)

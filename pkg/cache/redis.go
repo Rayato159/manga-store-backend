@@ -37,7 +37,8 @@ func NewRedisConnection(cfg *configs.Configs) *redis.Client {
 	})
 	pong, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		panic(err.Error())
+		log.Println("error, can't connect to redis 😥")
+		return nil
 	}
 	log.Printf("ping -> %v redis client has been connected 📕", pong)
 	return rdb

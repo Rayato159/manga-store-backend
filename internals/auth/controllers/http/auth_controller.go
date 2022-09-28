@@ -92,7 +92,7 @@ func (ac *authCon) RefreshToken(c *fiber.Ctx) error {
 		})
 	}
 
-	res, err := ac.AuthUse.RefreshToken(ctx, ac.Cfg, req.RefreshToken)
+	res, err := ac.AuthUse.RefreshToken(ctx, ac.Cfg, ac.Redis, req.RefreshToken)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entities.Response{
 			Status:     fiber.ErrInternalServerError.Message,

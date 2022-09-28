@@ -31,7 +31,7 @@ type AuthRepository interface {
 
 type AuthUsecase interface {
 	Login(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
-	RefreshToken(ctx context.Context, cfg *configs.Configs, refreshToken string) (*UsersCredentialsRes, error)
+	RefreshToken(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, refreshToken string) (*UsersCredentialsRes, error)
 }
 
 type UsersCredentialsReq struct {
