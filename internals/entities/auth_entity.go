@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/rayato159/manga-store/configs"
 )
@@ -29,7 +30,7 @@ type AuthRepository interface {
 }
 
 type AuthUsecase interface {
-	Login(ctx context.Context, cfg *configs.Configs, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
+	Login(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, req *UsersCredentialsReq) (*UsersCredentialsRes, error)
 	RefreshToken(ctx context.Context, cfg *configs.Configs, refreshToken string) (*UsersCredentialsRes, error)
 }
 

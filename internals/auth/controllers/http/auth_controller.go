@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
@@ -13,13 +14,15 @@ type authCon struct {
 	AuthUse  entities.AuthUsecase
 	UsersUse entities.UsersUsecase
 	Cfg      *configs.Configs
+	Redis    *redis.Client
 }
 
-func NewAuthController(r fiber.Router, cfg *configs.Configs, authUse entities.AuthUsecase, usersUse entities.UsersUsecase) {
+func NewAuthController(r fiber.Router, cfg *configs.Configs, rdb *redis.Client, authUse entities.AuthUsecase, usersUse entities.UsersUsecase) {
 	controller := &authCon{
 		AuthUse:  authUse,
 		UsersUse: usersUse,
 		Cfg:      cfg,
+		Redis:    rdb,
 	}
 	r.Post("/login", controller.Login)
 	r.Post("/refresh-token", controller.RefreshToken)
@@ -41,7 +44,7 @@ func (ac *authCon) Login(c *fiber.Ctx) error {
 		})
 	}
 
-	res, err := ac.AuthUse.Login(ctx, ac.Cfg, req)
+	res, err := ac.AuthUse.Login(ctx, ac.Cfg, ac.Redis, req)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(entities.Response{
 			Status:     fiber.ErrInternalServerError.Message,

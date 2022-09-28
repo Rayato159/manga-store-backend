@@ -2,11 +2,14 @@ package usecases
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"strconv"
 	"time"
 
+	"github.com/go-redis/redis/v9"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
 	"github.com/rayato159/manga-store/pkg/utils"
@@ -25,14 +28,54 @@ func NewAuthUsecase(authRepo entities.AuthRepository, usersRepo entities.UsersRe
 	}
 }
 
-func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
+func (au *authUse) getLoginCache(ctx context.Context, rdb *redis.Client, username string) (*entities.UsersInfo, error) {
+	ctx = context.WithValue(ctx, entities.AuthCon, "Con.getLoginCache")
+	defer log.Println(ctx.Value(entities.AuthCon))
+
+	val, err := rdb.Get(ctx, username).Result()
+	if err != nil || val == "" {
+		log.Println(err.Error())
+		return nil, fmt.Errorf("error, can't get value of key: %v", username)
+	}
+
+	user := new(entities.UsersInfo)
+	if err := json.Unmarshal([]byte(val), &user); err != nil {
+		log.Println(err.Error())
+		return nil, fmt.Errorf("error, can't parse: %v to object", val)
+	}
+	return user, nil
+}
+
+func (au *authUse) setLoginCache(ctx context.Context, rdb *redis.Client, key string, data any) error {
+	ctx = context.WithValue(ctx, entities.AuthCon, "Con.setLoginCache")
+	defer log.Println(ctx.Value(entities.AuthCon))
+
+	dataStringtify, err := json.Marshal(&data)
+	if err != nil {
+		return fmt.Errorf("error, can't parse: %v to stringtify", data)
+	}
+
+	if err := rdb.Set(ctx, key, string(dataStringtify), time.Hour*24).Err(); err != nil {
+		log.Println(err.Error())
+		return fmt.Errorf("error, can't set value of key: %v", data)
+	}
+	return nil
+}
+
+func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
 	ctx = context.WithValue(ctx, entities.AuthUse, "Use.Login")
 	defer log.Println(ctx.Value(entities.AuthUse))
 
-	// Find user by username
-	user, err := au.UsersRepo.GetUserInfo(ctx, "username", req.Username, "")
+	user, err := au.getLoginCache(ctx, rdb, req.Username)
 	if err != nil {
-		return nil, err
+		// Find user by username
+		user, err = au.UsersRepo.GetUserInfo(ctx, "username", req.Username, "")
+		if err != nil {
+			return nil, err
+		}
+		if err = au.setLoginCache(ctx, rdb, req.Username, user); err != nil {
+			return nil, err
+		}
 	}
 
 	// Password check
