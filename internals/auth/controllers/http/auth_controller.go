@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/middlewares"
 )
 
 type authCon struct {
@@ -25,7 +26,7 @@ func NewAuthController(r fiber.Router, cfg *configs.Configs, rdb *redis.Client, 
 		Redis:    rdb,
 	}
 	r.Post("/login", controller.Login)
-	r.Post("/refresh-token", controller.RefreshToken)
+	r.Post("/refresh-token", middlewares.JwtAuthentication(cfg), controller.RefreshToken)
 }
 
 func (ac *authCon) Login(c *fiber.Ctx) error {

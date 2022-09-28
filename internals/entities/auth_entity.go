@@ -46,19 +46,19 @@ type UsersCredentialsRes struct {
 }
 
 type UsersAccessToken struct {
-	Id   string `db:"id" json:"id"`
+	Id   string `db:"user_id" json:"user_id"`
 	Role string `db:"role" json:"role"`
 }
 
 type UsersRefreshToken struct {
-	Id        string `db:"id" json:"id"`
+	Id        string `db:"user_id" json:"user_id"`
 	Role      string `db:"role" json:"role"`
 	ExpiresAt *time.Time
 	IssuedAt  *time.Time
 }
 
 type UsersSessionToken struct {
-	Id        string `db:"id" json:"id"`
+	Id        string `db:"user_id" json:"user_id"`
 	Username  string `db:"username" json:"username"`
 	Role      string `db:"role" json:"role"`
 	ExpiresAt *time.Time
@@ -72,13 +72,13 @@ type UsersJwtClaimsReq struct {
 }
 
 type UsersJwtTokenMapClaims struct {
-	Id   string `db:"id" json:"id"`
+	Id   string `db:"user_id" json:"user_id"`
 	Role string `db:"role" json:"role"`
 	jwt.RegisteredClaims
 }
 
 type UsersJwtSessionMapClaims struct {
-	Id       string `db:"id" json:"id"`
+	Id       string `db:"user_id" json:"user_id"`
 	Username string `db:"username" json:"username"`
 	Role     string `db:"role" json:"role"`
 	jwt.RegisteredClaims
