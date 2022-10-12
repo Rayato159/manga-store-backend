@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,8 +22,9 @@ func NewUsersUsecase(usersRepo entities.UsersRepository) entities.UsersUsecase {
 }
 
 func (uu *usersUse) Register(ctx context.Context, req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {
-	ctx = context.WithValue(ctx, entities.UsersUse, "Use.Register")
-	defer log.Println(ctx.Value(entities.UsersUse))
+	ctx = context.WithValue(ctx, entities.UsersUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersUse).(int64)))
 
 	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), 10)
 	if err != nil {

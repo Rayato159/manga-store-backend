@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/utils"
 )
 
 type authRepo struct {
@@ -20,8 +22,9 @@ func NewAuthRepository(db *sqlx.DB) entities.AuthRepository {
 }
 
 func (ar *authRepo) UpdateUserRefreshToken(ctx context.Context, reqType string, userId string, token string, newToken string) error {
-	ctx = context.WithValue(ctx, entities.AuthRep, "Rep.UpdateUserRefreshToken")
-	defer log.Println(ctx.Value(entities.AuthRep))
+	ctx = context.WithValue(ctx, entities.AuthRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthRep).(int64)))
 
 	switch reqType {
 	case "user_id":

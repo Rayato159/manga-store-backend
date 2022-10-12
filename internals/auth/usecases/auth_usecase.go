@@ -29,8 +29,9 @@ func NewAuthUsecase(authRepo entities.AuthRepository, usersRepo entities.UsersRe
 }
 
 func (au *authUse) getUserInfoCache(ctx context.Context, rdb *redis.Client, key string) (*entities.UsersInfo, error) {
-	ctx = context.WithValue(ctx, entities.AuthCon, "Con.getLoginCache")
-	defer log.Println(ctx.Value(entities.AuthCon))
+	ctx = context.WithValue(ctx, entities.AuthUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthUse).(int64)))
 
 	val, err := rdb.Get(ctx, key).Result()
 	if err != nil || val == "" {
@@ -47,8 +48,9 @@ func (au *authUse) getUserInfoCache(ctx context.Context, rdb *redis.Client, key 
 }
 
 func (au *authUse) setUserInfoCache(ctx context.Context, rdb *redis.Client, key string, data any) error {
-	ctx = context.WithValue(ctx, entities.AuthCon, "Con.setLoginCache")
-	defer log.Println(ctx.Value(entities.AuthCon))
+	ctx = context.WithValue(ctx, entities.AuthUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthUse).(int64)))
 
 	dataStringtify, err := json.Marshal(&data)
 	if err != nil {
@@ -63,8 +65,9 @@ func (au *authUse) setUserInfoCache(ctx context.Context, rdb *redis.Client, key 
 }
 
 func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
-	ctx = context.WithValue(ctx, entities.AuthUse, "Use.Login")
-	defer log.Println(ctx.Value(entities.AuthUse))
+	ctx = context.WithValue(ctx, entities.AuthUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthUse).(int64)))
 
 	user := new(entities.UsersInfo)
 	var err error
@@ -164,8 +167,9 @@ func (au *authUse) Login(ctx context.Context, cfg *configs.Configs, rdb *redis.C
 }
 
 func (au *authUse) RefreshToken(ctx context.Context, cfg *configs.Configs, rdb *redis.Client, resfreshToken string) (*entities.UsersCredentialsRes, error) {
-	ctx = context.WithValue(ctx, entities.AuthUse, "Use.RefreshToken")
-	defer log.Println(ctx.Value(entities.AuthUse))
+	ctx = context.WithValue(ctx, entities.AuthUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthUse).(int64)))
 
 	user := new(entities.UsersInfo)
 	var err error

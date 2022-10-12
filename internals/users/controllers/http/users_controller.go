@@ -3,10 +3,12 @@ package http
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/utils"
 )
 
 type usersCon struct {
@@ -23,8 +25,9 @@ func NewUsersController(r fiber.Router, cfg *configs.Configs, usersUse entities.
 }
 
 func (uc *usersCon) Register(c *fiber.Ctx) error {
-	ctx := context.WithValue(c.Context(), entities.UsersCon, "Con.Register")
-	defer log.Println(ctx.Value(entities.UsersCon))
+	ctx := context.WithValue(c.Context(), entities.UsersCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersCon).(int64)))
 
 	req := new(entities.UsersRegisterReq)
 	if err := c.BodyParser(req); err != nil {
