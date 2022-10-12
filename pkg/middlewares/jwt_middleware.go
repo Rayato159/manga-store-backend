@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"strings"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
@@ -13,8 +14,9 @@ import (
 
 func JwtAuthentication(cfg *configs.Configs) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		ctx := context.WithValue(c.Context(), entities.AuthCon, "Middleware.JwtAuthentication")
-		defer log.Println(ctx.Value(entities.AuthCon))
+		ctx := context.WithValue(c.Context(), entities.MiddlewaresCon, time.Now().UnixMilli())
+		log.Printf("called:\t%v", utils.Trace())
+		defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.MiddlewaresCon).(int64)))
 
 		accessToken := strings.TrimPrefix(c.Get("Authorization"), "Bearer ")
 		if accessToken == "" {
@@ -38,6 +40,19 @@ func JwtAuthentication(cfg *configs.Configs) fiber.Handler {
 				},
 			})
 		}
+		userRole, err := utils.JwtExtractPayload(ctx, cfg, "role", accessToken)
+		if err != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(entities.Response{
+				Status:     fiber.ErrUnauthorized.Message,
+				StatusCode: fiber.StatusUnauthorized,
+				Message:    err.Error(),
+				Result: entities.Result{
+					Data: nil,
+				},
+			})
+		}
+		// Set role into Fiber cache in case to use with another function from next
+		c.Locals("role", userRole)
 
 		paramsUserId := c.Params("user_id")
 		if paramsUserId != "" && paramsUserId != userId {

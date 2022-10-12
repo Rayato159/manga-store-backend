@@ -17,6 +17,8 @@ import (
 	_authRepository "github.com/rayato159/manga-store/internals/auth/repositories"
 	_authUsecase "github.com/rayato159/manga-store/internals/auth/usecases"
 
+	_testsHttp "github.com/rayato159/manga-store/internals/tests/controllers/http"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -42,6 +44,10 @@ func (s *Server) MapHandlers() error {
 	authRepository := _authRepository.NewAuthRepository(s.Db)
 	authUsecase := _authUsecase.NewAuthUsecase(authRepository, usersRepository)
 	_authHttp.NewAuthController(authGroup, s.Cfg, s.Redis, authUsecase, usersUsecase)
+
+	//* Test group
+	testsGroup := v1.Group("/tests")
+	_testsHttp.NewTestsController(testsGroup, s.Cfg)
 
 	// End point not found response
 	s.Fiber.Use(func(c *fiber.Ctx) error {

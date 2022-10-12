@@ -3,12 +3,14 @@ package http
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/go-redis/redis/v9"
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
 	"github.com/rayato159/manga-store/pkg/middlewares"
+	"github.com/rayato159/manga-store/pkg/utils"
 )
 
 type authCon struct {
@@ -30,8 +32,9 @@ func NewAuthController(r fiber.Router, cfg *configs.Configs, rdb *redis.Client, 
 }
 
 func (ac *authCon) Login(c *fiber.Ctx) error {
-	ctx := context.WithValue(c.Context(), entities.AuthCon, "Con.Login")
-	defer log.Println(ctx.Value(entities.AuthCon))
+	ctx := context.WithValue(c.Context(), entities.AuthCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthCon).(int64)))
 
 	req := new(entities.UsersCredentialsReq)
 	if err := c.BodyParser(req); err != nil {
@@ -68,8 +71,9 @@ func (ac *authCon) Login(c *fiber.Ctx) error {
 }
 
 func (ac *authCon) RefreshToken(c *fiber.Ctx) error {
-	ctx := context.WithValue(c.Context(), entities.AuthCon, "Con.RefreshToken")
-	defer log.Println(ctx.Value(entities.AuthCon))
+	ctx := context.WithValue(c.Context(), entities.AuthCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthCon).(int64)))
 
 	req := new(entities.RefreshTokenReq)
 	if err := c.BodyParser(req); err != nil {

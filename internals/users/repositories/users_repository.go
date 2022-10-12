@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"log"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/utils"
 )
 
 type usersRepo struct {
@@ -20,8 +22,9 @@ func NewUsersRepository(db *sqlx.DB) entities.UsersRepository {
 }
 
 func (ur *usersRepo) FindOneUser(ctx context.Context, username string) (*entities.UsersCredentialsReq, error) {
-	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.FindOneUser")
-	defer log.Println(ctx.Value(entities.UsersRep))
+	ctx = context.WithValue(ctx, entities.UsersRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersRep).(int64)))
 
 	query := `
 	SELECT 
@@ -39,8 +42,9 @@ func (ur *usersRepo) FindOneUser(ctx context.Context, username string) (*entitie
 }
 
 func (ur *usersRepo) GetUserInfo(ctx context.Context, reqType string, username string, refreshToken string) (*entities.UsersInfo, error) {
-	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.GetUserInfo")
-	defer log.Println(ctx.Value(entities.UsersRep))
+	ctx = context.WithValue(ctx, entities.UsersRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersRep).(int64)))
 
 	switch reqType {
 	case "username":
@@ -81,8 +85,9 @@ func (ur *usersRepo) GetUserInfo(ctx context.Context, reqType string, username s
 }
 
 func (ur *usersRepo) Register(ctx context.Context, req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {
-	ctx = context.WithValue(ctx, entities.UsersRep, "Rep.Register")
-	defer log.Println(ctx.Value(entities.UsersRep))
+	ctx = context.WithValue(ctx, entities.UsersRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersRep).(int64)))
 
 	query := `
 	INSERT INTO "users"(
