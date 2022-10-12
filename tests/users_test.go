@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/rayato159/manga-store/configs"
@@ -15,10 +16,13 @@ import (
 	_usersUsecase "github.com/rayato159/manga-store/internals/users/usecases"
 	"github.com/rayato159/manga-store/pkg/databases"
 	"github.com/rayato159/manga-store/pkg/utils"
-	"github.com/rayato159/manga-store/tests/entities_test"
 )
 
-// Test users class
+type UsersRegisterTest struct {
+	Input  *entities.UsersRegisterReq
+	Expect string
+}
+
 type testUsers struct {
 	Cfg *configs.Configs
 	Db  *sqlx.DB
@@ -194,8 +198,9 @@ func TestRegister(t *testing.T) {
 }
 
 func (tuc *testUsersCon) Register(cfg *configs.Configs, req *entities.UsersRegisterReq) (*entities.UsersRegisterRes, error) {
-	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
-	defer log.Println(ctx.Value(entities_test.TestUsersCon))
+	ctx := context.WithValue(context.Background(), entities.UsersCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersCon).(int64)))
 
 	if req.Password != req.ConfirmPassword {
 		return nil, errors.New("error, confirm password is not match")

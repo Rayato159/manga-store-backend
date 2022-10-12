@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/go-redis/redis/v9"
 	"github.com/jmoiron/sqlx"
@@ -20,10 +21,8 @@ import (
 	"github.com/rayato159/manga-store/pkg/cache"
 	"github.com/rayato159/manga-store/pkg/databases"
 	"github.com/rayato159/manga-store/pkg/utils"
-	"github.com/rayato159/manga-store/tests/entities_test"
 )
 
-// Test users class
 type testAuth struct {
 	Cfg   *configs.Configs
 	Redis *redis.Client
@@ -253,8 +252,9 @@ func TestRefreshToken(t *testing.T) {
 }
 
 func (tuc *testAuthCon) Login(cfg *configs.Configs, rdb *redis.Client, req *entities.UsersCredentialsReq) (*entities.UsersCredentialsRes, error) {
-	ctx := context.WithValue(context.TODO(), entities_test.TestUsersCon, "TestCon.TestRegister")
-	defer log.Println(ctx.Value(entities_test.TestUsersCon))
+	ctx := context.WithValue(context.Background(), entities.AuthCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthCon).(int64)))
 
 	res, err := tuc.AuthUse.Login(ctx, cfg, rdb, req)
 	if err != nil {
@@ -264,8 +264,9 @@ func (tuc *testAuthCon) Login(cfg *configs.Configs, rdb *redis.Client, req *enti
 }
 
 func (tuc *testAuthCon) RefreshToken(cfg *configs.Configs, rdb *redis.Client, req *entities.RefreshTokenReq) (*entities.UsersCredentialsRes, error) {
-	ctx := context.WithValue(context.TODO(), entities.AuthCon, "Con.RefreshToken")
-	defer log.Println(ctx.Value(entities.AuthCon))
+	ctx := context.WithValue(context.Background(), entities.AuthCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.AuthCon).(int64)))
 
 	if req.RefreshToken == "" {
 		return nil, errors.New("error, refresh token is invalid")

@@ -8,6 +8,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/rayato159/manga-store/configs"
 	"github.com/rayato159/manga-store/internals/entities"
+	"github.com/rayato159/manga-store/pkg/middlewares"
 	"github.com/rayato159/manga-store/pkg/utils"
 )
 
@@ -21,7 +22,7 @@ func NewMonitorsController(r fiber.Router, cfg *configs.Configs, monitorsUse ent
 		MonitorsUse: monitorsUse,
 		Cfg:         cfg,
 	}
-	r.Get("/", controller.HealthCheck)
+	r.Get("/", middlewares.JwtAuthentication(cfg), middlewares.Authorization("admin"), controller.HealthCheck)
 }
 
 func (mc *monitorsCon) HealthCheck(c *fiber.Ctx) error {
