@@ -26,14 +26,14 @@ func Authorization(roles ...entities.UsersRole) fiber.Handler {
 		for i := range roles {
 			sum += rolesMap[roles[i]]
 		}
-		roleBinary := utils.BinaryConvertor(sum, 2)
+		roleBinary := utils.BinaryConvertor(sum, len(rolesMap))
 
 		// Get access token from cache of Fiber context
 		userRole := rolesMap[entities.UsersRole(c.Locals("role").(string))]
-		userRoleBinary := utils.BinaryConvertor(userRole, 2)
+		userRoleBinary := utils.BinaryConvertor(userRole, len(rolesMap))
 
 		// Bitwise operator to compare a role which can access or not
-		for i := 0; i < 2; i++ {
+		for i := 0; i < len(rolesMap); i++ {
 			if roleBinary[i]&userRoleBinary[i] == 1 {
 				return c.Next()
 			}

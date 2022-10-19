@@ -1,0 +1,805 @@
+{
+	"info": {
+		"_postman_id": "9aa57b53-49bb-4ded-8e16-675fb97335cd",
+		"name": "Manga Store Dev",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18192292"
+	},
+	"item": [
+		{
+			"name": "Client",
+			"item": [
+				{
+					"name": "Users",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "username",
+											"value": "managertest",
+											"type": "text"
+										},
+										{
+											"key": "password",
+											"value": "123456",
+											"type": "text"
+										},
+										{
+											"key": "password_confirm",
+											"value": "123456",
+											"type": "text"
+										},
+										{
+											"key": "role",
+											"value": "manager",
+											"description": "user || admin",
+											"type": "text"
+										},
+										{
+											"key": "key",
+											"value": "3RW8vGvsRDFxTHAp",
+											"description": "admin -> UMHNTiXpstOZk3IB || manager -> 3RW8vGvsRDFxTHAp",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{dev_url}}/users",
+									"host": [
+										"{{dev_url}}"
+									],
+									"path": [
+										"users"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "201 - User Created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "user001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "user",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 19:00:45 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "178"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Created\",\n    \"status_code\": 201,\n    \"message\": \"\",\n    \"result\": {\n        \"data\": {\n            \"username\": \"user001\",\n            \"created_at\": \"2022-09-10T19:00:45.068182Z\",\n            \"updated_at\": \"2022-09-10T19:00:45.068182Z\"\n        }\n    }\n}"
+								},
+								{
+									"name": "201 - Admin Created",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "admin001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "admin",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "UMHNTiXpstOZk3IB",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Created",
+									"code": 201,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 18:59:47 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "174"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Created\",\n    \"status_code\": 201,\n    \"message\": \"\",\n    \"result\": {\n        \"data\": {\n            \"username\": \"admin001\",\n            \"created_at\": \"2022-09-10T18:59:48.446588Z\",\n            \"updated_at\": \"2022-09-10T18:59:48.446588Z\"\n        }\n    }\n}"
+								},
+								{
+									"name": "400 - Password Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "user001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "user",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 18:57:35 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "114"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Bad Request\",\n    \"status_code\": 400,\n    \"message\": \"error, confirm password is not match\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+								},
+								{
+									"name": "400 - Username Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "user001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "user",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Internal Server Error",
+									"code": 500,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 18:58:00 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "126"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Internal Server Error\",\n    \"status_code\": 500,\n    \"message\": \"error, username has been already taken\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+								},
+								{
+									"name": "400 - Role Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "god001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "god",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 18:58:44 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "100"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Bad Request\",\n    \"status_code\": 400,\n    \"message\": \"error, role is invalid\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+								},
+								{
+									"name": "400 - Admin Key Error",
+									"originalRequest": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "urlencoded",
+											"urlencoded": [
+												{
+													"key": "username",
+													"value": "admin001",
+													"type": "text"
+												},
+												{
+													"key": "password",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "password_confirm",
+													"value": "password@1234",
+													"type": "text"
+												},
+												{
+													"key": "role",
+													"value": "admin",
+													"type": "text"
+												},
+												{
+													"key": "key",
+													"value": "",
+													"type": "text"
+												}
+											]
+										},
+										"url": {
+											"raw": "{{dev_url}}/users",
+											"host": [
+												"{{dev_url}}"
+											],
+											"path": [
+												"users"
+											]
+										}
+									},
+									"status": "Bad Request",
+									"code": 400,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Sat, 10 Sep 2022 18:59:22 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "105"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"Bad Request\",\n    \"status_code\": 400,\n    \"message\": \"error, admin key is invalid\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Authentication",
+					"item": [
+						{
+							"name": "Login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let res = pm.response.json()\r",
+											"let access_token = res.result.data.access_token\r",
+											"let refresh_token = res.result.data.refresh_token\r",
+											"let session_token = res.result.data.session_token\r",
+											"pm.environment.set(\"access_token\", access_token)\r",
+											"pm.environment.set(\"refresh_token\", refresh_token)\r",
+											"pm.environment.set(\"session_token\", session_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "Username",
+											"value": "admintest",
+											"description": "usertest || admintest || managertest",
+											"type": "text"
+										},
+										{
+											"key": "Password",
+											"value": "123456",
+											"description": "123456",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{dev_url}}/auth/login",
+									"host": [
+										"{{dev_url}}"
+									],
+									"path": [
+										"auth",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Refresh Token",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"let res = pm.response.json()\r",
+											"let access_token = res.result.data.access_token\r",
+											"let refresh_token = res.result.data.refresh_token\r",
+											"let session_token = res.result.data.session_token\r",
+											"pm.environment.set(\"access_token\", access_token)\r",
+											"pm.environment.set(\"refresh_token\", refresh_token)\r",
+											"pm.environment.set(\"session_token\", session_token)"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "urlencoded",
+									"urlencoded": [
+										{
+											"key": "refresh_token",
+											"value": "{{refresh_token}}",
+											"type": "text"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{dev_url}}/auth/refresh-token",
+									"host": [
+										"{{dev_url}}"
+									],
+									"path": [
+										"auth",
+										"refresh-token"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Monitors",
+					"item": [
+						{
+							"name": "Health Check",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{access_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dev_url}}",
+									"host": [
+										"{{dev_url}}"
+									]
+								}
+							},
+							"response": [
+								{
+									"name": "200 - Success",
+									"originalRequest": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{dev_url}}",
+											"host": [
+												"{{dev_url}}"
+											]
+										}
+									},
+									"status": "OK",
+									"code": 200,
+									"_postman_previewlanguage": "json",
+									"header": [
+										{
+											"key": "Date",
+											"value": "Thu, 25 Aug 2022 03:57:23 GMT"
+										},
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Content-Length",
+											"value": "135"
+										}
+									],
+									"cookie": [],
+									"body": "{\n    \"status\": \"OK\",\n    \"status_code\": 200,\n    \"message\": \"\",\n    \"result\": {\n        \"data\": {\n            \"Health\": \"health is 100% 👌2022-08-25 10:57:24\",\n            \"Version\": \"v1.0.0\"\n        }\n    }\n}"
+								}
+							]
+						}
+					],
+					"auth": {
+						"type": "bearer",
+						"bearer": [
+							{
+								"key": "token",
+								"value": "{{access_token}}",
+								"type": "string"
+							}
+						]
+					},
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{access_token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Test",
+			"item": [
+				{
+					"name": "Authorization",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{dev_url}}/tests/authorization",
+							"host": [
+								"{{dev_url}}"
+							],
+							"path": [
+								"tests",
+								"authorization"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "200 - OK",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dev_url}}/tests/authorization",
+									"host": [
+										"{{dev_url}}"
+									],
+									"path": [
+										"tests",
+										"authorization"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 19 Oct 2022 14:46:31 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "69"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"OK\",\n    \"status_code\": 200,\n    \"message\": \"\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+						},
+						{
+							"name": "401 - No Permission",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{dev_url}}/tests/authorization",
+									"host": [
+										"{{dev_url}}"
+									],
+									"path": [
+										"tests",
+										"authorization"
+									]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 19 Oct 2022 14:42:12 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								},
+								{
+									"key": "Content-Length",
+									"value": "114"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"status\": \"Unauthorized\",\n    \"status_code\": 401,\n    \"message\": \"error, have no permission to access\",\n    \"result\": {\n        \"data\": null\n    }\n}"
+						}
+					]
+				}
+			]
+		}
+	]
+}
