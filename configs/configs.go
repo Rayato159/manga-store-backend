@@ -49,6 +49,7 @@ type File struct {
 type App struct {
 	Version                string
 	AdminKey               string
+	ManagerKey             string
 	Stage                  string
 	JwtSecretKey           string
 	JwtAccessTokenExpires  string

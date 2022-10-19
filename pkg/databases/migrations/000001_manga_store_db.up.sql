@@ -14,6 +14,7 @@ $$ language 'plpgsql';
 
 CREATE TYPE "user_role" AS ENUM (
     'user',
+    'manager',
     'admin'
 );
 

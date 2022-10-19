@@ -17,8 +17,9 @@ func Authorization(roles ...entities.UsersRole) fiber.Handler {
 		defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.MiddlewaresCon).(int64)))
 
 		rolesMap := map[entities.UsersRole]int{
-			"user":  1, // 2^0
-			"admin": 2, // 2^1
+			"user":    1, // 2^0
+			"manager": 2, // 2^1
+			"admin":   4, // 2^2
 		}
 		// Find a summation of expected role
 		var sum int

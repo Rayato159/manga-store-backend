@@ -26,8 +26,9 @@ type UsersRepository interface {
 type UsersRole string
 
 const (
-	Admin UsersRole = "admin"
-	User  UsersRole = "user"
+	Admin   UsersRole = "admin"
+	Manager UsersRole = "manager"
+	User    UsersRole = "user"
 )
 
 type UsersInfo struct {
@@ -42,7 +43,7 @@ type UsersRegisterReq struct {
 	Password        string    `db:"password" json:"password" form:"password"`
 	ConfirmPassword string    `json:"passowrd_confirm" form:"password_confirm"`
 	Role            UsersRole `db:"role" json:"role" form:"role"`
-	AdminKey        string    `json:"admin_key" form:"admin_key"`
+	Key             string    `json:"key" form:"key"`
 }
 
 type UsersRegisterRes struct {

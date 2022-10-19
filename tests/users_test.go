@@ -111,7 +111,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "111111",
 				Role:            "user",
-				AdminKey:        "",
+				Key:             "",
 			},
 			Expect: "error, confirm password is not match",
 			Type:   "error",
@@ -123,7 +123,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "123456",
 				Role:            "god",
-				AdminKey:        "",
+				Key:             "",
 			},
 			Expect: "error, role is invalid",
 			Type:   "error",
@@ -135,7 +135,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "123456",
 				Role:            "admin",
-				AdminKey:        "imadmin",
+				Key:             "imadmin",
 			},
 			Expect: "error, admin key is invalid",
 			Type:   "error",
@@ -147,7 +147,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "123456",
 				Role:            "user",
-				AdminKey:        "",
+				Key:             "",
 			},
 			Expect: "error, username has been already taken",
 			Type:   "error",
@@ -159,7 +159,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "123456",
 				Role:            "user",
-				AdminKey:        "",
+				Key:             "",
 			},
 			Expect: "no error, user",
 			Type:   "result",
@@ -171,7 +171,7 @@ func TestRegister(t *testing.T) {
 				Password:        "123456",
 				ConfirmPassword: "123456",
 				Role:            "admin",
-				AdminKey:        "UMHNTiXpstOZk3IB",
+				Key:             "UMHNTiXpstOZk3IB",
 			},
 			Expect: "no error, admin",
 			Type:   "result",
@@ -208,7 +208,7 @@ func (tuc *testUsersCon) Register(cfg *configs.Configs, req *entities.UsersRegis
 
 	switch req.Role {
 	case entities.Admin:
-		if req.AdminKey != cfg.App.AdminKey {
+		if req.Key != cfg.App.AdminKey {
 			return nil, errors.New("error, admin key is invalid")
 		}
 	case entities.User:

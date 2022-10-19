@@ -54,11 +54,22 @@ func (uc *usersCon) Register(c *fiber.Ctx) error {
 
 	switch req.Role {
 	case entities.Admin:
-		if req.AdminKey != uc.Cfg.App.AdminKey {
+		if req.Key != uc.Cfg.App.AdminKey {
 			return c.Status(fiber.StatusBadRequest).JSON(entities.Response{
 				Status:     fiber.ErrBadRequest.Message,
 				StatusCode: fiber.StatusBadRequest,
 				Message:    "error, admin key is invalid",
+				Result: entities.Result{
+					Data: nil,
+				},
+			})
+		}
+	case entities.Manager:
+		if req.Key != uc.Cfg.App.ManagerKey {
+			return c.Status(fiber.StatusBadRequest).JSON(entities.Response{
+				Status:     fiber.ErrBadRequest.Message,
+				StatusCode: fiber.StatusBadRequest,
+				Message:    "error, manager key is invalid",
 				Result: entities.Result{
 					Data: nil,
 				},
