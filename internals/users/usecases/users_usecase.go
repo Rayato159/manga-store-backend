@@ -45,3 +45,34 @@ func (uu *usersUse) Register(ctx context.Context, req *entities.UsersRegisterReq
 	}
 	return res, nil
 }
+
+func (uu *usersUse) ChangePassword(ctx context.Context, req *entities.ChangePasswordReq) error {
+	ctx = context.WithValue(ctx, entities.UsersUse, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersUse).(int64)))
+
+	userOldHashedPassword, err := uu.UsersRepo.GetUserPassword(ctx, req.UserId)
+	if err != nil {
+		return err
+	}
+
+	// Compare an old password
+	if err := bcrypt.CompareHashAndPassword([]byte(userOldHashedPassword), []byte(req.OldPassword)); err != nil {
+		log.Println(err.Error())
+		return errors.New("error, old password is invalid")
+	}
+
+	// Hash a new password
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), 10)
+	if err != nil {
+		log.Println(err.Error())
+		return err
+	}
+	req.NewPassword = string(hashed)
+
+	// Update a user's password
+	if err := uu.UsersRepo.ChangePassword(ctx, req); err != nil {
+		return err
+	}
+	return nil
+}

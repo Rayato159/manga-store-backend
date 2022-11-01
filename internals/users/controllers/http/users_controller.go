@@ -2,6 +2,7 @@ package http
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -22,6 +23,7 @@ func NewUsersController(r fiber.Router, cfg *configs.Configs, usersUse entities.
 		Cfg:      cfg,
 	}
 	r.Post("/", controller.Register)
+	r.Patch("/:user_id/change-password", controller.ChangePassword)
 }
 
 func (uc *usersCon) Register(c *fiber.Ctx) error {
@@ -105,6 +107,58 @@ func (uc *usersCon) Register(c *fiber.Ctx) error {
 		Message:    "",
 		Result: entities.Result{
 			Data: res,
+		},
+	})
+}
+
+func (uc *usersCon) ChangePassword(c *fiber.Ctx) error {
+	ctx := context.WithValue(c.Context(), entities.UsersCon, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersCon).(int64)))
+
+	userId := c.Params("user_id")
+	req := new(entities.ChangePasswordReq)
+	if err := c.BodyParser(req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(entities.Response{
+			Status:     fiber.ErrBadRequest.Message,
+			StatusCode: fiber.StatusBadRequest,
+			Message:    "error, can't parse a request body into the struct",
+			Result: entities.Result{
+				Data: nil,
+			},
+		})
+	}
+	req.UserId = userId
+
+	if err := uc.UsersUse.ChangePassword(ctx, req); err != nil {
+		switch err.Error() {
+		case "error, old password is invalid":
+			return c.Status(fiber.StatusBadRequest).JSON(entities.Response{
+				Status:     fiber.ErrBadRequest.Message,
+				StatusCode: fiber.StatusBadRequest,
+				Message:    err.Error(),
+				Result: entities.Result{
+					Data: nil,
+				},
+			})
+		default:
+			return c.Status(fiber.StatusInternalServerError).JSON(entities.Response{
+				Status:     fiber.ErrInternalServerError.Message,
+				StatusCode: fiber.StatusInternalServerError,
+				Message:    err.Error(),
+				Result: entities.Result{
+					Data: nil,
+				},
+			})
+		}
+	}
+
+	return c.Status(fiber.StatusOK).JSON(entities.Response{
+		Status:     "OK",
+		StatusCode: fiber.StatusOK,
+		Message:    "",
+		Result: entities.Result{
+			Data: fmt.Sprintf("success, password was changed for user_id -> %s", userId),
 		},
 	})
 }

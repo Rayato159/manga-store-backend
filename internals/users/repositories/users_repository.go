@@ -130,3 +130,37 @@ func (ur *usersRepo) Register(ctx context.Context, req *entities.UsersRegisterRe
 	}
 	return user, nil
 }
+
+func (ur *usersRepo) GetUserPassword(ctx context.Context, userId string) (string, error) {
+	ctx = context.WithValue(ctx, entities.UsersRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersRep).(int64)))
+
+	query := `SELECT "password" FROM "users" WHERE "id" = $1 LIMIT 1;`
+
+	var password string
+	if err := ur.Db.Get(&password, query, userId); err != nil {
+		log.Println(err.Error())
+		return "", errors.New("error, can't query to get an user's password")
+	}
+	return password, nil
+}
+
+func (ur *usersRepo) ChangePassword(ctx context.Context, req *entities.ChangePasswordReq) error {
+	ctx = context.WithValue(ctx, entities.UsersRep, time.Now().UnixMilli())
+	log.Printf("called:\t%v", utils.Trace())
+	defer log.Printf("return:\t%v time:%v ms", utils.Trace(), utils.CallTimer(ctx.Value(entities.UsersRep).(int64)))
+
+	query := `
+	UPDATE "users"
+	SET
+	"password" = :password
+	WHERE "id" = :id;
+	`
+
+	if _, err := ur.Db.NamedExec(query, req); err != nil {
+		log.Println(err.Error())
+		return errors.New("error, can't query to update an user password")
+	}
+	return nil
+}

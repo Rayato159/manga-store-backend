@@ -58,6 +58,5 @@ func (s *Server) MapHandlers() error {
 			Message:    "error, endpoint is not found",
 		})
 	})
-
 	return nil
 }
