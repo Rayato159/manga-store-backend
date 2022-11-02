@@ -62,3 +62,24 @@ type ChangePasswordReq struct {
 	NewPassword     string `db:"password" json:"new_password" form:"new_password"`
 	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
 }
+
+type UsersProfile struct {
+	Id           string                  `db:"id" json:"id"`
+	Username     string                  `db:"username" json:"username"`
+	Addresses    []*UsersShippingAddress `json:"adresses"`
+	CouponUsages []*CouponsUsage         `json:"coupon_usages"`
+}
+
+type UsersShippingAddress struct {
+	Id       string `db:"id" json:"id"`
+	Contract string `db:"contract" json:"contract"`
+	Address  string `db:"address" json:"address"`
+}
+
+type CouponsUsage struct {
+	Id           int     `db:"id" json:"id"`
+	CouponId     string  `db:"coupon_id" json:"coupon_id"`
+	Code         string  `db:"code" json:"code"`
+	Discount     float64 `db:"discount" json:"discount"`
+	DiscountType string  `db:"discount_type" json:"discount_type"`
+}

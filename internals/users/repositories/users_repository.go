@@ -143,6 +143,10 @@ func (ur *usersRepo) GetUserPassword(ctx context.Context, userId string) (string
 		log.Println(err.Error())
 		return "", errors.New("error, can't query to get an user's password")
 	}
+	if password == "" {
+		log.Println("error, user not found")
+		return "", errors.New("error, user not found")
+	}
 	return password, nil
 }
 
@@ -163,4 +167,8 @@ func (ur *usersRepo) ChangePassword(ctx context.Context, req *entities.ChangePas
 		return errors.New("error, can't query to update an user password")
 	}
 	return nil
+}
+
+func (ur *usersRepo) GetUserProfile(ctx context.Context, userId string) {
+	return
 }
